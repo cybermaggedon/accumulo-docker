@@ -44,7 +44,7 @@
 
   <property>
     <name>instance.secret</name>
-    <value>DEFAULT</value>
+    <value>accumulo</value>
     <description>A secret unique to a given instance that all servers must know in order to communicate with one another.
       Change it before initialization. To
       change it later use ./bin/accumulo org.apache.accumulo.server.util.ChangeSecret --old [oldpasswd] --new [newpasswd],
@@ -54,7 +54,7 @@
 
   <property>
     <name>tserver.memory.maps.max</name>
-    <value>80M</value>
+    <value>8M</value>
   </property>
 
   <property>
@@ -64,18 +64,18 @@
 
   <property>
     <name>tserver.cache.data.size</name>
-    <value>7M</value>
+    <value>2M</value>
   </property>
 
   <property>
     <name>tserver.cache.index.size</name>
-    <value>20M</value>
+    <value>2M</value>
   </property>
 
   <property>
     <name>trace.token.property.password</name>
     <!-- change this to the root user's password, and/or change the user below -->
-    <value>secret</value>
+    <value>accumulo</value>
   </property>
 
   <!-- Kerberos requirements --><!--
@@ -122,12 +122,12 @@
 
   <property>
     <name>tserver.sort.buffer.size</name>
-    <value>50M</value>
+    <value>5M</value>
   </property>
 
   <property>
     <name>tserver.walog.max.size</name>
-    <value>100M</value>
+    <value>5M</value>
   </property>
 
   <property>
