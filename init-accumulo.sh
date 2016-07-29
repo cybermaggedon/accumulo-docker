@@ -9,9 +9,9 @@ rm -f /tmp/*.pid
 # installing libraries if any - (resource urls added comma separated to the ACP system variable)
 cd $HADOOP_PREFIX/share/hadoop/common ; for cp in ${ACP//,/ }; do  echo == $cp; curl -LO $cp ; done; cd -
 
-sed "s/HOSTNAME/$HOSTNAME/g" /usr/local/hadoop/etc/hadoop/core-site.xml.template > /usr/local/hadoop/etc/hadoop/core-site.xml
+#sed "s/HOSTNAME/$HOSTNAME/g" /usr/local/hadoop/etc/hadoop/core-site.xml.template > /usr/local/hadoop/etc/hadoop/core-site.xml
 
-sed "s/HOSTNAME/$HOSTNAME/g" /usr/local/accumulo/conf/accumulo-site-template.xml > /usr/local/accumulo/conf/accumulo-site.xml
+#sed "s/HOSTNAME/$HOSTNAME/g" /usr/local/accumulo/conf/accumulo-site-template.xml > /usr/local/accumulo/conf/accumulo-site.xml
 
 echo $HOSTNAME > /usr/local/accumulo/conf/gc
 echo $HOSTNAME > /usr/local/accumulo/conf/masters
