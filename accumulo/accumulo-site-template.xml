@@ -36,7 +36,7 @@
 
     <property>
         <name>instance.secret</name>
-        <value>secret</value>
+        <value>accumulo</value>
     </property>
 
     <!-- PLACEHOLDER - do not edit -->
@@ -44,7 +44,7 @@
     <property>
         <name>trace.token.property.password</name>
         <!-- change this to the root user's password, and/or change the user below -->
-        <value>secret</value>
+        <value>accumulo</value>
     </property>
 
     <!-- profile 3GB -->

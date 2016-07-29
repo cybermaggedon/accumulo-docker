@@ -25,3 +25,9 @@ $HADOOP_PREFIX/sbin/start-dfs.sh
 $HADOOP_PREFIX/bin/hdfs dfsadmin -safemode wait
 $HADOOP_PREFIX/sbin/start-yarn.sh
 $ACCUMULO_HOME/bin/start-all.sh
+
+while true
+do
+    sleep 10
+done
+

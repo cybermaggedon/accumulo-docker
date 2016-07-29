@@ -30,5 +30,7 @@ RUN chown root:root /*-accumulo;\
 ADD init-accumulo.sh /tmp/
 RUN /tmp/init-accumulo.sh
 
+CMD /start-accumulo
+
 EXPOSE 2181 9000 50095
 
