@@ -27,10 +27,10 @@ ADD stop-all.sh /stop-accumulo
 RUN chown root:root /*-accumulo;\
  chmod 700 /*-accumulo
 
-ADD init-accumulo.sh /tmp/
-RUN /tmp/init-accumulo.sh
+ADD init-accumulo.sh /init-accumulo
+#RUN /tmp/init-accumulo.sh
 
-CMD /start-accumulo
+#CMD /start-accumulo
 
 EXPOSE 2181 9000 50095
 

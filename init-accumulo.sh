@@ -1,38 +1,19 @@
 #!/bin/bash
 
-: ${HADOOP_PREFIX:=/usr/local/hadoop}
-
-. $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
-
-rm -f /tmp/*.pid
-
-# installing libraries if any - (resource urls added comma separated to the ACP system variable)
-cd $HADOOP_PREFIX/share/hadoop/common ; for cp in ${ACP//,/ }; do  echo == $cp; curl -LO $cp ; done; cd -
-
-#sed "s/HOSTNAME/$HOSTNAME/g" /usr/local/hadoop/etc/hadoop/core-site.xml.template > /usr/local/hadoop/etc/hadoop/core-site.xml
-
-#sed "s/HOSTNAME/$HOSTNAME/g" /usr/local/accumulo/conf/accumulo-site-template.xml > /usr/local/accumulo/conf/accumulo-site.xml
-
-echo $HOSTNAME > /usr/local/accumulo/conf/gc
-echo $HOSTNAME > /usr/local/accumulo/conf/masters
-echo $HOSTNAME > /usr/local/accumulo/conf/monitor
-echo $HOSTNAME > /usr/local/accumulo/conf/slaves
-echo $HOSTNAME > /usr/local/accumulo/conf/tracers
-
 /usr/sbin/sshd
 
-$ZOOKEEPER_HOME/bin/zkServer.sh start
+/usr/local/hadoop/bin/hdfs namenode -format
 
-$HADOOP_PREFIX/sbin/start-dfs.sh
-$HADOOP_PREFIX/bin/hdfs dfsadmin -safemode wait
-$HADOOP_PREFIX/sbin/start-yarn.sh
+/usr/local/hadoop/sbin/start-dfs.sh
+/usr/local/hadoop/bin/hdfs dfsadmin -safemode wait
 
-$ACCUMULO_HOME/bin/accumulo init --instance-name accumulo --password accumulo
+/usr/local/zookeeper/bin/zkServer.sh start
 
-. $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
+/usr/local/accumulo/bin/accumulo init --instance-name accumulo --password accumulo
 
-$HADOOP_PREFIX/sbin/stop-yarn.sh
-$HADOOP_PREFIX/sbin/stop-dfs.sh
+/usr/local/zookeeper/bin/zkServer.sh stop
+/usr/local/hadoop/sbin/stop-dfs.sh
 
-$ZOOKEEPER_HOME/bin/zkServer.sh stop
+ps -ef | grep sshd | grep -v grep | awk '{print $2}' | xargs kill
+
 
