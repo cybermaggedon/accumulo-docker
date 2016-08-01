@@ -1,0 +1,14 @@
+#!/bin/bash
+
+/start-hadoop
+
+/usr/local/zookeeper/bin/zkServer.sh start
+
+if [ ! -f /.init.accumulo ]
+then
+    /usr/local/accumulo/bin/accumulo init --instance-name accumulo --password accumulo
+    touch /.init.accumulo
+fi
+
+/usr/local/accumulo/bin/start-all.sh
+
