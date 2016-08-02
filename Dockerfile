@@ -1,7 +1,7 @@
 
-FROM alientechnology/hadoop
+FROM cybermaggedon/hadoop
 
-MAINTAINER alientechnology
+MAINTAINER cybermaggedon
 
 ENV PATH $PATH:$HADOOP_PREFIX/bin
 
