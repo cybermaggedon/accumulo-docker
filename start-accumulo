@@ -1,9 +1,5 @@
 #!/bin/bash
 
-/start-hadoop
-
-/usr/local/zookeeper/bin/zkServer.sh start
-
 if [ ! -f /.init.accumulo ]
 then
     /usr/local/accumulo/bin/accumulo init --instance-name accumulo --password accumulo
@@ -12,3 +8,7 @@ fi
 
 /usr/local/accumulo/bin/start-all.sh
 
+while true
+do
+    sleep 100000
+done
