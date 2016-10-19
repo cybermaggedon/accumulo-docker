@@ -1,10 +1,11 @@
 #!/bin/bash
 
-if [ ! -f /data/.init.accumulo ]
+if [ ! -f /accumulo/.init.accumulo ]
 then
+    echo 'Initialise accumulo...'
     /usr/local/accumulo/bin/accumulo init --instance-name accumulo --password accumulo
     mkdir -p /data
-    touch /data/.init.accumulo
+    touch /accumulo/.init.accumulo
 fi
 
 uname -n > /usr/local/accumulo/conf/gc
@@ -19,3 +20,4 @@ while true
 do
     sleep 100000
 done
+

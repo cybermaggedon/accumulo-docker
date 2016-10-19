@@ -1,6 +1,8 @@
 This work is based on [https://github.com/medined/docker-accumulo](https://github.com/medined/docker-accumulo), and mraad/accumulo.
 
-Single-node Accumulo instance for development purposes.
+Single-node Accumulo instance for development purposes.  There are two
+hard-coded hostnames: 'hadoop' for HDFS, and 'zookeeper' for
+Zookeeper.
 
 To run:
 
