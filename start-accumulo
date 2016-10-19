@@ -7,6 +7,12 @@ then
     touch /data/.init.accumulo
 fi
 
+uname -n > /usr/local/accumulo/conf/gc
+uname -n > /usr/local/accumulo/conf/masters
+uname -n > /usr/local/accumulo/conf/monitor
+uname -n > /usr/local/accumulo/conf/slaves
+uname -n > /usr/local/accumulo/conf/tracers
+
 /usr/local/accumulo/bin/start-all.sh
 
 while true
