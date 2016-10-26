@@ -21,5 +21,5 @@ hadoop-2.7.3.tar.gz:
 	wget http://mirror.catn.com/pub/apache/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
 
 push:
-	${SUDO} docker build ${BUILD_ARGS} -t ${REPOSITORY}:${VERSION}	
+	${SUDO} docker push ${REPOSITORY}:${VERSION}
 
