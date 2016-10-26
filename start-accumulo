@@ -1,9 +1,10 @@
 #!/bin/bash
 
-if [ ! -f /.init.accumulo ]
+if [ ! -f /data/.init.accumulo ]
 then
     /usr/local/accumulo/bin/accumulo init --instance-name accumulo --password accumulo
-    touch /.init.accumulo
+    mkdir -p /data
+    touch /data/.init.accumulo
 fi
 
 /usr/local/accumulo/bin/start-all.sh
