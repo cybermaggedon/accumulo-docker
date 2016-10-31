@@ -16,7 +16,7 @@ To run:
 
   # Start Accumulo, linking to other containers.
   docker run --rm --name accumulo --link zookeeper:zookeeper \
-        --link hadoop:hadoop cybermaggedon/accumulo:1.8.0
+        --link hadoop:hadoop cybermaggedon/accumulo:1.7.8
 
 ```
 
@@ -51,6 +51,6 @@ e.g.
   # Start Accumulo, linking to other containers.
   docker run --rm --name accumulo --link zookeeper:zookeeper \
         --link hadoop:hadoop -v /data/accumulo:/accumulo \
-	cybermaggedon/accumulo:1.8.0
+	cybermaggedon/accumulo:1.7.8
 
 ```

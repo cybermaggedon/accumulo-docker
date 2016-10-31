@@ -21,9 +21,9 @@ RUN cd /usr/local/ && tar xvfz zookeeper.tgz
 RUN mv /usr/local/zookeeper-3.4.9 /usr/local/zookeeper
 RUN rm -f /usr/local/zookeeper.tgz
 
-COPY accumulo-1.8.0-bin.tar.gz /usr/local/accumulo.tgz
+COPY accumulo-1.7.2-bin.tar.gz /usr/local/accumulo.tgz
 RUN cd /usr/local/ && tar xvfz accumulo.tgz
-RUN mv /usr/local/accumulo-1.8.0 /usr/local/accumulo
+RUN mv /usr/local/accumulo-1.7.2 /usr/local/accumulo
 RUN rm -f /usr/local/accumulo.tgz
 
 ENV ACCUMULO_HOME /usr/local/accumulo
