@@ -54,3 +54,64 @@ e.g.
 	cybermaggedon/accumulo:1.8.0
 
 ```
+
+
+
+
+
+docker network create --driver=bridge --subnet=10.0.10.0/24 mynet
+
+docker run -p 9000:9000 -v /data/hadoop:/data \
+  --ip=10.0.10.5 --net mynet \
+  --name hadoop \
+  cybermaggedon/hadoop:2.7.3
+
+docker run -p 2181:2181 -v /data/zookeeper:/data \
+  --ip=10.0.10.6 --net mynet \
+  --link hadoop=hadoop \
+  --name zookeeper \
+  cybermaggedon/zookeeper:3.4.9
+
+docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 50095:50095 \
+  -e ZOOKEEPERS=10.0.10.6 \
+  -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo1 \
+  -e MY_HOSTNAME=10.0.10.10 \
+  -e GC_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e MASTER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e SLAVE_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e MONITOR_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e TRACER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e DAEMONS=gc,master,tserver,monitor,tracer \
+  -v /data/acc1:/accumulo \
+  --link hadoop=hadoop \
+  --name acc1 cybermaggedon/accumulo:1.8.0
+  
+docker run --rm -i -t --ip=10.0.10.11 --net mynet \
+  -e ZOOKEEPERS=10.0.10.6 \
+  -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo2 \
+  -e MY_HOSTNAME=10.0.10.10 \
+  -e GC_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e MASTER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e SLAVE_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e MONITOR_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e TRACER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e DAEMONS=gc,master,tserver,monitor,tracer \
+  -v /data/acc2:/accumulo \
+  --link hadoop=hadoop \
+  --name acc2 cybermaggedon/accumulo:1.8.0
+  
+docker run --rm -i -t --ip=10.0.10.12 --net mynet \
+  -e ZOOKEEPERS=10.0.10.6 \
+  -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo3 \
+  -e MY_HOSTNAME=10.0.10.10 \
+  -e GC_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e MASTER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e SLAVE_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e MONITOR_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e TRACER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e DAEMONS=gc,master,tserver,monitor,tracer \
+  -v /data/acc3:/accumulo \
+  --link hadoop=hadoop \
+  --name acc3 cybermaggedon/accumulo:1.8.0
+
+----------------------------------------------------------------------------
