@@ -18,7 +18,7 @@ ADD zookeeper-3.4.9.tar.gz /usr/local/
 RUN ln -s /usr/local/zookeeper-3.4.9 /usr/local/zookeeper
 
 # Accumulo
-ADD accumulo-1.8.0-bin.tar.gz /usr/local/accumulo.tgz
+ADD accumulo-1.8.0-bin.tar.gz /usr/local/
 RUN ln -s /usr/local/accumulo-1.8.0 /usr/local/accumulo
 
 ENV ACCUMULO_HOME /usr/local/accumulo
