@@ -8,6 +8,7 @@ RUN echo -e "\n* soft nofile 65536\n* hard nofile 65536" >> /etc/security/limits
 RUN dnf install -y tar
 RUN dnf install -y java-1.8.0-openjdk
 RUN dnf install -y procps-ng hostname
+RUN dnf install -y which
 
 # hadoop
 ADD hadoop-2.7.3.tar.gz /usr/local/

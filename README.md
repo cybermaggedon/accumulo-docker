@@ -62,10 +62,10 @@ e.g.
 docker network create --driver=bridge --subnet=10.0.10.0/24 mynet
 
 docker run -p 9000:9000 -v /data/hadoop:/data \
-  --ip=10.0.10.5 --net mynet \
+  --ip=10.0.10.5 --net mynet -p 50070:50070 \
   --name hadoop \
   cybermaggedon/hadoop:2.7.3
-
+  
 docker run -p 2181:2181 -v /data/zookeeper:/data \
   --ip=10.0.10.6 --net mynet \
   --link hadoop=hadoop \
@@ -75,6 +75,7 @@ docker run -p 2181:2181 -v /data/zookeeper:/data \
 docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 50095:50095 \
   -e ZOOKEEPERS=10.0.10.6 \
   -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo1 \
+  -e NAMENODE_URI=hdfs://hadoop:9000/ \
   -e MY_HOSTNAME=10.0.10.10 \
   -e GC_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
   -e MASTER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
@@ -89,6 +90,7 @@ docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 50095:50095 \
 docker run --rm -i -t --ip=10.0.10.11 --net mynet \
   -e ZOOKEEPERS=10.0.10.6 \
   -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo2 \
+  -e NAMENODE_URI=hdfs://hadoop:9000/ \
   -e MY_HOSTNAME=10.0.10.10 \
   -e GC_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
   -e MASTER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
@@ -103,6 +105,7 @@ docker run --rm -i -t --ip=10.0.10.11 --net mynet \
 docker run --rm -i -t --ip=10.0.10.12 --net mynet \
   -e ZOOKEEPERS=10.0.10.6 \
   -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo3 \
+  -e NAMENODE_URI=hdfs://hadoop:9000/ \
   -e MY_HOSTNAME=10.0.10.10 \
   -e GC_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
   -e MASTER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
