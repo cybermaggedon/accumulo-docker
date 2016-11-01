@@ -10,6 +10,8 @@ rewrite() {
     mv -f $1.tmp $1
 }
 
+. /usr/local/accumulo/conf/accumulo-env.sh
+
 ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
 MY_HOSTNAME=${MY_HOSTNAME:-localhost}
 HDFS_VOLUMES=${HDFS_VOLUMES:-file:/accumulo}
@@ -18,15 +20,6 @@ INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
 SECRET=${SECRET:-accumulo}
 
 rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
-
-if [ ! -f /accumulo/.init.accumulo ]
-then
-    echo 'Initialise accumulo...'
-    /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
-        --password ${SECRET} --clear-instance-name
-    mkdir -p /data
-    touch /accumulo/.init.accumulo
-fi
 
 (
     for v in $(echo ${GC_HOSTS} | sed 's/,/ /g')
@@ -72,10 +65,27 @@ fi
   echo "</configuration>"
 ) > /usr/local/hadoop/etc/hadoop/core-site.xml
 
+if [ ! -f /accumulo/.init.accumulo ]
+then
+    if [ "${ACCUMULO_INIT}" != no ]
+    then
+        echo 'Initialise accumulo...'
+        /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
+            --password ${SECRET} --clear-instance-name
+        mkdir -p /data
+        touch /accumulo/.init.accumulo
+    fi
+fi
+
 (
     for v in $(echo ${DAEMONS} | sed 's/,/ /g')
     do
 	echo Starting $v...
+	if [ "$v" == master ]
+	then
+	    /usr/local/accumulo/bin/accumulo \
+		org.apache.accumulo.master.state.SetGoalState NORMAL
+	fi
 	/usr/local/accumulo/bin/start-daemon.sh ${MY_HOSTNAME} $v
     done
 )
