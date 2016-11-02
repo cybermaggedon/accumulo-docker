@@ -67,7 +67,7 @@ rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
 
 if [ ! -f /accumulo/.init.accumulo ]
 then
-    if [ "${ACCUMULO_INIT}" != no ]
+    if [ "${ACCUMULO_INIT}" == y ]
     then
         echo 'Initialise accumulo...'
         /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \

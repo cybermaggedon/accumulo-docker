@@ -124,9 +124,9 @@ docker run --rm -i -t --ip=10.0.10.12 --net mynet \
 
 docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 9995:9995 -p 9997:9997 \
   -e ZOOKEEPERS=10.0.10.6 \
-  -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo \
+  -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo1 \
   -e ACCUMULO_INIT=y \
-  -e INSTANCE_NAME=accumulo01 \
+  -e INSTANCE_NAME=accumulo1 \
   -e NAMENODE_URI= \
   -e MY_HOSTNAME=10.0.10.10 \
   -e GC_HOSTS=10.0.10.10 \
@@ -140,8 +140,8 @@ docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 9995:9995 -p 9997:9997 \
   
 docker run --rm -i -t --ip=10.0.10.11 --net mynet -P \
   -e ZOOKEEPERS=10.0.10.6 \
-  -e HDFS_VOLUMES=file:/accumulo \
-  -e INSTANCE_NAME=accumulo01 \
+  -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo1 \
+  -e INSTANCE_NAME=accumulo1 \
   -e NAMENODE_URI= \
   -e MY_HOSTNAME=10.0.10.11 \
   -e GC_HOSTS=10.0.10.10 \
@@ -155,8 +155,8 @@ docker run --rm -i -t --ip=10.0.10.11 --net mynet -P \
   
 docker run --rm -i -t --ip=10.0.10.12 --net mynet -P \
   -e ZOOKEEPERS=10.0.10.6 \
-  -e HDFS_VOLUMES=file:/accumulo \
-  -e INSTANCE_NAME=accumulo01 \
+  -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo1 \
+  -e INSTANCE_NAME=accumulo1 \
   -e NAMENODE_URI= \
   -e MY_HOSTNAME=10.0.10.12 \
   -e GC_HOSTS=10.0.10.10 \
