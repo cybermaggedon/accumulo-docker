@@ -5,21 +5,25 @@ rewrite() {
 	sed \
 	    -e "s#@ZOOKEEPERS@#${ZOOKEEPERS}#" \
 	    -e "s#@HDFS_VOLUMES@#${HDFS_VOLUMES}#" \
+	    -e "s#@SECRET@#${SECRET}#" \
 	    > $1.tmp
     mv -f $1.tmp $1
 }
 
 ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
 MY_HOSTNAME=${MY_HOSTNAME:-localhost}
-HDFS_VOLUMES=${HDFS_VOLUMES:-hdfs://hadoop:9000/accumulo}
-NAMENODE_URI=${NAMENODE_URI:-hdfs://hadoop:9000/}
+HDFS_VOLUMES=${HDFS_VOLUMES:-file:/accumulo}
+NAMENODE_URI=${NAMENODE_URI:-}
+INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
+SECRET=${SECRET:-accumulo}
 
 rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
 
 if [ ! -f /accumulo/.init.accumulo ]
 then
     echo 'Initialise accumulo...'
-    /usr/local/accumulo/bin/accumulo init --instance-name accumulo --password accumulo
+    /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
+        --password ${SECRET} --clear-instance-name
     mkdir -p /data
     touch /accumulo/.init.accumulo
 fi
