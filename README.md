@@ -1,10 +1,8 @@
-This work is based on [https://github.com/medined/docker-accumulo](https://github.com/medined/docker-accumulo), and mraad/accumulo.
+Accumulo container, needs Hadoop HDFS and Zookeeper.
 
-Single-node Accumulo instance for development purposes.  There are two
-hard-coded hostnames: 'hadoop' for HDFS, and 'zookeeper' for
-Zookeeper.
-
-To run:
+Simplest scenario, single node Hadoop, single node Zookeeper, single node
+Accumulo, no persistence.  Accumulo uses hostname 'hadoop' for HDFS by default,
+and 'zookeeper' for Zookeeper.
 
 ```
 
@@ -15,14 +13,14 @@ To run:
   docker run --rm --name zookeeper cybermaggedon/zookeeper:3.4.9
 
   # Start Accumulo, linking to other containers.
-  docker run --rm --name accumulo --link zookeeper:zookeeper \
-        --link hadoop:hadoop cybermaggedon/accumulo:1.8.0
+  docker run --rm --name accumulo -p 9995:9995 -p 9997:9997 -p 9999:9999 \
+        --link hadoop:hadoop \
+	--link zookeeper:zookeeper \
+        cybermaggedon/accumulo:1.8.0
 
 ```
 
-Default root password is `accumulo`.
-
-To check it works:
+Default Accumulo root password is `accumulo`.  To check it works:
 
 ```
 
@@ -35,7 +33,8 @@ To check it works:
 ... and you should see a list of tables.
 
 If you want to persist Accumulo you will need to ensure Hadoop and Zookeeper
-are persistent, and mount a volume on ```/accumulo```.
+are persistent.  Here we are using /data/hadoop and /data/zookeeper as
+persistent volumes.
 
 e.g.
 
@@ -49,12 +48,19 @@ e.g.
         cybermaggedon/zookeeper:3.4.9
 
   # Start Accumulo, linking to other containers.
-  docker run --rm --name accumulo --link zookeeper:zookeeper \
-        --link hadoop:hadoop -v /data/accumulo:/accumulo \
+  docker run --rm --name accumulo  -p 9995:9995 -p 9997:9997 -p 9999:9999 \
+        --link hadoop:hadoop \
+        --link zookeeper:zookeeper \
 	cybermaggedon/accumulo:1.8.0
 
 ```
 
+
+
+
+Standalone
+
+docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 9995:9995 -p 9997:9997   -e ZOOKEEPERS=10.0.10.6  -e ACCUMULO_INIT=y  --link hadoop=hadoop   --name acc1 cybermaggedon/accumulo:1.8.0
 
 
 

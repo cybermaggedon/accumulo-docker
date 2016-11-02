@@ -18,6 +18,7 @@ HDFS_VOLUMES=${HDFS_VOLUMES:-hdfs://hadoop:9000/accumulo}
 NAMENODE_URI=${NAMENODE_URI:-}
 INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
 SECRET=${SECRET:-accumulo}
+ACCUMULO_INIT=${ACCUMULO_INIT:-${HDFS_VOLUMES}_init}
 
 DAEMONS=${DAEMONS:-gc,master,tserver,monitor,tracer}
 
@@ -73,16 +74,13 @@ rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
   echo "</configuration>"
 ) > /usr/local/hadoop/etc/hadoop/core-site.xml
 
-if [ ! -f /accumulo/.init.accumulo ]
+/usr/local/hadoop/bin/hdfs dfs -ls ${ACCUMULO_INIT}
+if [ $? -ne 0 ]
 then
-    if [ "${ACCUMULO_INIT}" == y ]
-    then
-        echo 'Initialise accumulo...'
-        /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
-            --password ${SECRET} --clear-instance-name
-        mkdir -p /data
-        touch /accumulo/.init.accumulo
-    fi
+    echo 'Initialise accumulo...'
+    /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
+				     --password ${SECRET} --clear-instance-name
+    /usr/local/hadoop/bin/hdfs dfs -put /dev/null ${ACCUMULO_INIT}
 fi
 
 (
