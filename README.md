@@ -276,15 +276,15 @@ deployment:
   the Zookeeper servers.  Defaults to ```zookeeper```, useful for
   a single stand-alone Zookeeper.
 - ```HDFS_VOLUMES```: A comma separated list of HDFS URIs for volumes to
-  store Accumulo data.  I've only tested with one volume.  Defaults to
-  ```hdfs://hadoop:9000/accumulo```.
+  store Accumulo data.  I've only tested with one volume.  Defaults
+  to ```hdfs://hadoop:9000/accumulo```.
 - ```INSTANCE_NAME```: A unique name for this Accumulo instance.  All
   nodes in an Accumulo cluster should have a different name.  Defaults
   to ```accumulo```, useful only for a single-node Accumulo cluster.
 - ```MY_HOSTNAME```: Hostname or IP address to share with other nodes in
   the cluster.  Defaults to ```localhost```, useful only for a standalone
   cluster.
-- ```GC_HOSTS```, ```MASTER_HOSTS```, ```SLAVE_HOSTS```, ```MONITOR_HOSTS```,
-  ```TRACER_HOSTS``` list of hostnames or IP addresses of nodes which
+- ```GC_HOSTS```, ```MASTER_HOSTS```, ```SLAVE_HOSTS```, ```MONITOR_HOSTS```
+  and ```TRACER_HOSTS``` list of hostnames or IP addresses of nodes which
   run these daemons.
 
