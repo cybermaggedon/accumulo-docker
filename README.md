@@ -286,5 +286,15 @@ deployment:
   cluster.
 - ```GC_HOSTS```, ```MASTER_HOSTS```, ```SLAVE_HOSTS```, ```MONITOR_HOSTS```
   and ```TRACER_HOSTS``` list of hostnames or IP addresses of nodes which
-  run these daemons.
+  run these daemons.  Defaults to something useful for a single-node cluster.
+
+The following environment variables are used to tailor Accumulo sizing.
+The default values are very low, suitable for a development environment, but
+nothing more significant.
+
+- ```MEMORY_MAPS_MAX```: Default 8M.
+- ```CACHE_DATA_SIZE```: Default 2M.
+- ```CACHE_INDEX_SIZE```: Default 2M.
+- ```SORT_BUFFER_SIZE```: Default 5M.
+- ```WALOG_MAX_SIZE```: Default 5M.
 

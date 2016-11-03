@@ -6,11 +6,21 @@ rewrite() {
 	    -e "s#@ZOOKEEPERS@#${ZOOKEEPERS}#" \
 	    -e "s#@HDFS_VOLUMES@#${HDFS_VOLUMES}#" \
 	    -e "s#@SECRET@#${SECRET}#" \
+	    -e "s#@MEMORY_MAPS_MAX@#${MEMORY_MAPS_MAX}#" \
+	    -e "s#@CACHE_DATA_SIZE@#${CACHE_DATA_SIZE}#" \
+	    -e "s#@CACHE_INDEX_SIZE@#${CACHE_INDEX_SIZE}#" \
+	    -e "s#@SORT_BUFFER_SIZE@#${SORT_BUFFER_SIZE}#" \
+	    -e "s#@WALOG_MAX_SIZE@#${WALOG_MAX_SIZE}#" \
 	    > $1.tmp
     mv -f $1.tmp $1
 }
 
-. /usr/local/accumulo/conf/accumulo-env.sh
+# Default memory allocations
+MEMORY_MAPS_MAX=${MEMORY_MAPS_MAX:-8M}
+CACHE_DATA_SIZE=${CACHE_DATA_SIZE:-2M}
+CACHE_INDEX_SIZE=${CACHE_INDEX_SIZE:-2M}
+SORT_BUFFER_SIZE=${SORT_BUFFER_SIZE:-5M}
+WALOG_MAX_SIZE=${WALOG_MAX_SIZE:-5M}
 
 ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
 MY_HOSTNAME=${MY_HOSTNAME:-localhost}
@@ -27,6 +37,8 @@ MASTER_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
 SLAVE_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
 MONITOR_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
 TRACER_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
+
+. /usr/local/accumulo/conf/accumulo-env.sh
 
 rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
 
