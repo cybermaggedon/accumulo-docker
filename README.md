@@ -55,72 +55,131 @@ e.g.
 
 ```
 
+To do anything more complicated, we need to be able to manage the
+names or addresses that are provided to containers.  Easiest way
+is to set up a user-defined network and allocate the IP addresses manually.
+
+```
+
+  # Create network
+  docker network create --driver=bridge --subnet=10.10.0.0/16 my_network
+
+  # HDFS namenode
+  docker run --rm --ip=10.10.6.3 --net my_network \
+      -e DAEMONS=namenode,datanode,secondarynamenode \
+      --name=hadoop01 \
+      -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 9000:9000 \
+      cybermaggedon/hadoop:2.7.3
+
+  # HDFS datanodes
+  docker run --rm --ip=10.10.6.4 --net my_network --link hadoop01:hadoop01 \
+      -e DAEMONS=datanode -e NAMENODE_URI=hdfs://hadoop01:9000 \
+      --name=hadoop02 \
+      cybermaggedon/hadoop:2.7.3
+  docker run --rm --ip=10.10.6.5 --net my_network --link hadoop01:hadoop01 \
+      -e DAEMONS=datanode -e NAMENODE_URI=hdfs://hadoop01:9000 \
+      --name=hadoop03 \
+      cybermaggedon/hadoop:2.7.3
+
+  # Zookeeper cluster, 3 nodes.
+  docker run --rm --ip=10.10.5.10 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e ZOOKEEPER_MYID=1 \
+      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.9
+      
+  docker run --rm -i -t --ip=10.10.5.11 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e ZOOKEEPER_MYID=2 --name zk2 --link zk1:zk1 \
+      cybermaggedon/zookeeper:3.4.9
+      
+  docker run --rm -i -t --ip=10.10.5.12 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e ZOOKEEPER_MYID=3 --name zk3 --link zk1:zk1 \
+      cybermaggedon/zookeeper:3.4.9
+
+  # Accumulo, 3 nodes
+  docker run --rm -i -t --ip=10.10.10.10 --net my_network \
+      -p 50095:50095 -p 9995:9995 \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e INSTANCE_NAME=accumulo01 \
+      -e NAMENODE_URI= \
+      -e MY_HOSTNAME=10.10.10.10 \
+      -e GC_HOSTS=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+      -e MONITOR_HOSTS=10.10.10.10 \
+      -e TRACER_HOSTS=10.10.10.10 \
+      -e DAEMONS=gc,master,tserver,monitor,tracer \
+      --link hadoop01:hadoop01 \
+      --name acc01 cybermaggedon/accumulo:1.8.0
+
+  docker run --rm -i -t --ip=10.10.10.11 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e INSTANCE_NAME=accumulo02 \
+      -e NAMENODE_URI= \
+      -e MY_HOSTNAME=10.10.10.11 \
+      -e GC_HOSTS=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+      -e MONITOR_HOSTS=10.10.10.10 \
+      -e TRACER_HOSTS=10.10.10.10 \
+      -e DAEMONS=tserver \
+      --link hadoop01:hadoop01 \
+      --name acc02 cybermaggedon/accumulo:1.8.0
+
+  docker run --rm -i -t --ip=10.10.10.12 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e INSTANCE_NAME=accumulo03 \
+      -e NAMENODE_URI= \
+      -e MY_HOSTNAME=10.10.10.12 \
+      -e GC_HOSTS=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+      -e MONITOR_HOSTS=10.10.10.10 \
+      -e TRACER_HOSTS=10.10.10.10 \
+      -e DAEMONS=tserver \
+      --link hadoop01:hadoop01 \
+      --name acc03 cybermaggedon/accumulo:1.8.0
 
 
 
-Standalone
-
-docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 9995:9995 -p 9997:9997   -e ZOOKEEPERS=10.0.10.6  -e ACCUMULO_INIT=y  --link hadoop=hadoop   --name acc1 cybermaggedon/accumulo:1.8.0
 
 
 
 
-docker network create --driver=bridge --subnet=10.0.10.0/24 mynet
 
-docker run -p 9000:9000 -v /data/hadoop:/data \
-  --ip=10.0.10.5 --net mynet -p 50070:50070 \
-  --name hadoop \
-  cybermaggedon/hadoop:2.7.3
+
   
-docker run -p 2181:2181 -v /data/zookeeper:/data \
-  --ip=10.0.10.6 --net mynet \
-  --link hadoop=hadoop \
-  --name zookeeper \
-  cybermaggedon/zookeeper:3.4.9
-
-docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 50095:50095 -p 9995:9995 \
-  -e ZOOKEEPERS=10.0.10.6 \
-  -e HDFS_VOLUMES=file:/accumulo \
-  -e INSTANCE_NAME=accumulo01 \
-  -e NAMENODE_URI= \
-  -e MY_HOSTNAME=10.0.10.10 \
-  -e GC_HOSTS=10.0.10.10 \
-  -e MASTER_HOSTS=10.0.10.10 \
-  -e SLAVE_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e MONITOR_HOSTS=10.0.1010 \
-  -e TRACER_HOSTS=10.0.10.10,10 \
-  -e DAEMONS=gc,master,tserver,monitor,tracer \
-  -v /data/acc1:/accumulo \
-  --link hadoop=hadoop \
-  --name acc1 cybermaggedon/accumulo:1.8.0
-  
-docker run --rm -i -t --ip=10.0.10.11 --net mynet \
-  -e ZOOKEEPERS=10.0.10.6 \
+docker run --rm -i -t --ip=10.10.10.11 --net my_network \
+  -e ZOOKEEPERS=10.10.10.6 \
   -e HDFS_VOLUMES=file:/accumulo \
   -e INSTANCE_NAME=accumulo02 \
   -e NAMENODE_URI= \
-  -e MY_HOSTNAME=10.0.10.11 \
-  -e GC_HOSTS=10.0.10.10 \
-  -e MASTER_HOSTS=10.0.10.10 \
-  -e SLAVE_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e MONITOR_HOSTS=10.0.10.10 \
-  -e TRACER_HOSTS=10.0.10.10 \
+  -e MY_HOSTNAME=10.10.10.11 \
+  -e GC_HOSTS=10.10.10.10 \
+  -e MASTER_HOSTS=10.10.10.10 \
+  -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e MONITOR_HOSTS=10.10.10.10 \
+  -e TRACER_HOSTS=10.10.10.10 \
   -e DAEMONS=tserver \
   -v /data/acc2:/accumulo \
   --link hadoop=hadoop \
   --name acc2 cybermaggedon/accumulo:1.8.0
   
-docker run --rm -i -t --ip=10.0.10.12 --net mynet \
-  -e ZOOKEEPERS=10.0.10.6 \
+docker run --rm -i -t --ip=10.10.10.12 --net my_network \
+  -e ZOOKEEPERS=10.10.10.6 \
   -e HDFS_VOLUMES=file:/accumulo \
   -e INSTANCE_NAME=accumulo03 \
   -e NAMENODE_URI= \
-  -e MY_HOSTNAME=10.0.10.12 \
-  -e GC_HOSTS=10.0.10.10 \
-  -e MASTER_HOSTS=10.0.10.10 \
-  -e SLAVE_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e MONITOR_HOSTS=10.0.10.10 \
-  -e TRACER_HOSTS=10.0.10.10 \
+  -e MY_HOSTNAME=10.10.10.12 \
+  -e GC_HOSTS=10.10.10.10 \
+  -e MASTER_HOSTS=10.10.10.10 \
+  -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e MONITOR_HOSTS=10.10.10.10 \
+  -e TRACER_HOSTS=10.10.10.10 \
   -e DAEMONS=tserver \
   -v /data/acc3:/accumulo \
   --link hadoop=hadoop \
@@ -128,66 +187,66 @@ docker run --rm -i -t --ip=10.0.10.12 --net mynet \
 
 ----------------------------------------------------------------------------
 
-docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 9995:9995 -p 9997:9997 \
-  -e ZOOKEEPERS=10.0.10.6 \
+docker run --rm -i -t --ip=10.10.10.10 --net my_network -p 9995:9995 -p 9997:9997 \
+  -e ZOOKEEPERS=10.10.10.6 \
   -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo1 \
   -e ACCUMULO_INIT=y \
   -e INSTANCE_NAME=accumulo1 \
   -e NAMENODE_URI= \
-  -e MY_HOSTNAME=10.0.10.10 \
-  -e GC_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e MASTER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e SLAVE_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e MONITOR_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e TRACER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e MY_HOSTNAME=10.10.10.10 \
+  -e GC_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e MASTER_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e MONITOR_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e TRACER_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
   -e DAEMONS=gc,master,tserver,monitor,tracer \
   --link hadoop=hadoop \
   --name acc1 cybermaggedon/accumulo:1.8.0
   
-docker run --rm -i -t --ip=10.0.10.11 --net mynet -P \
-  -e ZOOKEEPERS=10.0.10.6 \
+docker run --rm -i -t --ip=10.10.10.11 --net my_network -P \
+  -e ZOOKEEPERS=10.10.10.6 \
   -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo1 \
   -e INSTANCE_NAME=accumulo1 \
   -e NAMENODE_URI= \
-  -e MY_HOSTNAME=10.0.10.11 \
-  -e GC_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e MASTER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e SLAVE_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e MONITOR_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e TRACER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e MY_HOSTNAME=10.10.10.11 \
+  -e GC_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e MASTER_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e MONITOR_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e TRACER_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
   -e DAEMONS=tserver,tracer \
   --link hadoop=hadoop \
   --name acc2 cybermaggedon/accumulo:1.8.0
   
-docker run --rm -i -t --ip=10.0.10.12 --net mynet -P \
-  -e ZOOKEEPERS=10.0.10.6 \
+docker run --rm -i -t --ip=10.10.10.12 --net my_network -P \
+  -e ZOOKEEPERS=10.10.10.6 \
   -e HDFS_VOLUMES=hdfs://hadoop:9000/accumulo1 \
   -e INSTANCE_NAME=accumulo1 \
   -e NAMENODE_URI= \
-  -e MY_HOSTNAME=10.0.10.12 \
-  -e GC_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e MASTER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e SLAVE_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e MONITOR_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
-  -e TRACER_HOSTS=10.0.10.10,10.0.10.11,10.0.10.12 \
+  -e MY_HOSTNAME=10.10.10.12 \
+  -e GC_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e MASTER_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e MONITOR_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
+  -e TRACER_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
   -e DAEMONS=tserver,tracer \
   --link hadoop=hadoop \
   --name acc3 cybermaggedon/accumulo:1.8.0
 
 ----------------------------------------------------------------------------
 
-docker run --rm -i -t --ip=10.0.10.10 --net mynet -p 9995:9995 -p 9997:9997 \
-  -e ZOOKEEPERS=10.0.10.6 \
+docker run --rm -i -t --ip=10.10.10.10 --net my_network -p 9995:9995 -p 9997:9997 \
+  -e ZOOKEEPERS=10.10.10.6 \
   -e HDFS_VOLUMES=file:/accumulo \
   -e ACCUMULO_INIT=y \
   -e INSTANCE_NAME=accumulo01 \
   -e NAMENODE_URI= \
-  -e MY_HOSTNAME=10.0.10.10 \
-  -e GC_HOSTS=10.0.10.10 \
-  -e MASTER_HOSTS=10.0.10.10 \
-  -e SLAVE_HOSTS=10.0.10.10 \
-  -e MONITOR_HOSTS=10.0.1010 \
-  -e TRACER_HOSTS=10.0.10.10 \
+  -e MY_HOSTNAME=10.10.10.10 \
+  -e GC_HOSTS=10.10.10.10 \
+  -e MASTER_HOSTS=10.10.10.10 \
+  -e SLAVE_HOSTS=10.10.10.10 \
+  -e MONITOR_HOSTS=10.10.1010 \
+  -e TRACER_HOSTS=10.10.10.10 \
   -e DAEMONS=gc,master,tserver,monitor,tracer \
   --link hadoop=hadoop \
   --name acc1 cybermaggedon/accumulo:1.8.0
