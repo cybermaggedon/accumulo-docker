@@ -22,8 +22,13 @@ CACHE_INDEX_SIZE=${CACHE_INDEX_SIZE:-2M}
 SORT_BUFFER_SIZE=${SORT_BUFFER_SIZE:-5M}
 WALOG_MAX_SIZE=${WALOG_MAX_SIZE:-5M}
 
+MY_IP=$(/usr/sbin/ifconfig | grep 'inet[^6]' | awk '{print $2}' |
+	    sed 's/addr://' | grep -v 127.0.0.1 | grep -v 0.0.0.0 |
+	    head -n 1)
+echo My IP is ${MY_IP}.
+
 ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
-MY_HOSTNAME=${MY_HOSTNAME:-localhost}
+MY_HOSTNAME=${MY_HOSTNAME:-${MY_IP}}
 HDFS_VOLUMES=${HDFS_VOLUMES:-hdfs://hadoop:9000/accumulo}
 NAMENODE_URI=${NAMENODE_URI:-}
 INSTANCE_NAME=${INSTANCE_NAME:-accumulo}

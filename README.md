@@ -109,7 +109,6 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -p 50095:50095 -p 9995:9995 \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e INSTANCE_NAME=accumulo01 \
       -e NAMENODE_URI= \
       -e MY_HOSTNAME=10.10.10.10 \
       -e GC_HOSTS=10.10.10.10 \
@@ -123,7 +122,6 @@ is to set up a user-defined network and allocate the IP addresses manually.
   docker run -d --ip=10.10.10.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e INSTANCE_NAME=accumulo02 \
       -e NAMENODE_URI= \
       -e MY_HOSTNAME=10.10.10.11 \
       -e GC_HOSTS=10.10.10.10 \
@@ -137,7 +135,6 @@ is to set up a user-defined network and allocate the IP addresses manually.
   docker run -d --ip=10.10.10.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e INSTANCE_NAME=accumulo03 \
       -e NAMENODE_URI= \
       -e MY_HOSTNAME=10.10.10.12 \
       -e GC_HOSTS=10.10.10.10 \
@@ -214,7 +211,6 @@ HDFS for state, so no volumes needed.
       -p 50095:50095 -p 9995:9995 \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e INSTANCE_NAME=accumulo01 \
       -e NAMENODE_URI= \
       -e MY_HOSTNAME=10.10.10.10 \
       -e GC_HOSTS=10.10.10.10 \
@@ -229,7 +225,6 @@ HDFS for state, so no volumes needed.
   docker run -d --ip=10.10.10.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e INSTANCE_NAME=accumulo02 \
       -e NAMENODE_URI= \
       -e MY_HOSTNAME=10.10.10.11 \
       -e GC_HOSTS=10.10.10.10 \
@@ -243,7 +238,6 @@ HDFS for state, so no volumes needed.
   docker run -d --ip=10.10.10.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e INSTANCE_NAME=accumulo03 \
       -e NAMENODE_URI= \
       -e MY_HOSTNAME=10.10.10.12 \
       -e GC_HOSTS=10.10.10.10 \
@@ -264,9 +258,8 @@ deployment:
 - ```HDFS_VOLUMES```: A comma separated list of HDFS URIs for volumes to
   store Accumulo data.  I've only tested with one volume.  Defaults
   to ```hdfs://hadoop:9000/accumulo```.
-- ```INSTANCE_NAME```: A unique name for this Accumulo instance.  All
-  nodes in an Accumulo cluster should have a different name.  Defaults
-  to ```accumulo```, useful only for a single-node Accumulo cluster.
+- ```INSTANCE_NAME```: A unique name for this Accumulo instance.  Defaults
+  to ```accumulo```.
 - ```MY_HOSTNAME```: Hostname or IP address to share with other nodes in
   the cluster.  Defaults to ```localhost```, useful only for a standalone
   cluster.
