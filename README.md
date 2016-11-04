@@ -105,7 +105,7 @@ is to set up a user-defined network and allocate the IP addresses manually.
   ############################################################################
   # Accumulo, 3 nodes
   ############################################################################
-  docker run -d -i -t --ip=10.10.10.10 --net my_network \
+  docker run -d --ip=10.10.10.10 --net my_network \
       -p 50095:50095 -p 9995:9995 \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
@@ -117,11 +117,10 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=gc,master,tserver,monitor,tracer \
       --link hadoop01:hadoop01 \
       --name acc01 cybermaggedon/accumulo:1.8.0
 
-  docker run -d -i -t --ip=10.10.10.11 --net my_network \
+  docker run -d --ip=10.10.10.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
       -e INSTANCE_NAME=accumulo02 \
@@ -132,11 +131,10 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=tserver \
       --link hadoop01:hadoop01 \
       --name acc02 cybermaggedon/accumulo:1.8.0
 
-  docker run -d -i -t --ip=10.10.10.12 --net my_network \
+  docker run -d --ip=10.10.10.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
       -e INSTANCE_NAME=accumulo03 \
@@ -147,7 +145,6 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=tserver \
       --link hadoop01:hadoop01 \
       --name acc03 cybermaggedon/accumulo:1.8.0
 
@@ -225,7 +222,6 @@ HDFS for state, so no volumes needed.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=gc,master,tserver,monitor,tracer \
       --link hadoop01:hadoop01 \
       --name acc01 cybermaggedon/accumulo:1.8.0
 
@@ -241,7 +237,6 @@ HDFS for state, so no volumes needed.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=tserver \
       --link hadoop01:hadoop01 \
       --name acc02 cybermaggedon/accumulo:1.8.0
 
@@ -256,7 +251,6 @@ HDFS for state, so no volumes needed.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=tserver \
       --link hadoop01:hadoop01 \
       --name acc03 cybermaggedon/accumulo:1.8.0
 
@@ -264,9 +258,6 @@ HDFS for state, so no volumes needed.
 
 The following environment variables are used to tailor the Accumulo
 deployment:
-- ```DAEMONS```: A comma-separate list of daemons to run, from ```master```,
-  ```gc```, ```monitor```, ```tserver```, ```tracer```.  Default is to run
-  all of them, useful for a stand-alone deployment.
 - ```ZOOKEEPERS```: A comma separated list of hostnames or IP addresses of
   the Zookeeper servers.  Defaults to ```zookeeper```, useful for
   a single stand-alone Zookeeper.
