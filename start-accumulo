@@ -30,8 +30,6 @@ INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
 SECRET=${SECRET:-accumulo}
 ACCUMULO_INIT=${ACCUMULO_INIT:-${HDFS_VOLUMES}_init}
 
-DAEMONS=${DAEMONS:-gc,master,tserver,monitor,tracer}
-
 GC_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
 MASTER_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
 SLAVE_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
@@ -95,18 +93,7 @@ then
     /usr/local/hadoop/bin/hdfs dfs -put /dev/null ${ACCUMULO_INIT}
 fi
 
-(
-    for v in $(echo ${DAEMONS} | sed 's/,/ /g')
-    do
-	echo Starting $v...
-	if [ "$v" == master ]
-	then
-	    /usr/local/accumulo/bin/accumulo \
-		org.apache.accumulo.master.state.SetGoalState NORMAL
-	fi
-	/usr/local/accumulo/bin/start-daemon.sh ${MY_HOSTNAME} $v
-    done
-)
+/usr/local/accumulo/bin/start-here.sh
 
 while true
 do

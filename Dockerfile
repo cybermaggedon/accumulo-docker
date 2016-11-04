@@ -33,8 +33,6 @@ ADD accumulo/* $ACCUMULO_HOME/conf/
 ADD start-accumulo /start-accumulo
 ADD stop-accumulo /stop-accumulo
 
-RUN chown root:root /*-accumulo; chmod 700 /*-accumulo
-
 CMD /start-accumulo
 
 EXPOSE 9000 50095 42424 9995 9997

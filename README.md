@@ -117,7 +117,6 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=gc,master,tserver,monitor,tracer \
       --link hadoop01:hadoop01 \
       --name acc01 cybermaggedon/accumulo:1.7.2
 
@@ -132,7 +131,6 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=tserver \
       --link hadoop01:hadoop01 \
       --name acc02 cybermaggedon/accumulo:1.7.2
 
@@ -147,7 +145,6 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=tserver \
       --link hadoop01:hadoop01 \
       --name acc03 cybermaggedon/accumulo:1.7.2
 
@@ -225,7 +222,6 @@ HDFS for state, so no volumes needed.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=gc,master,tserver,monitor,tracer \
       --link hadoop01:hadoop01 \
       --name acc01 cybermaggedon/accumulo:1.7.2
 
@@ -241,7 +237,6 @@ HDFS for state, so no volumes needed.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=tserver \
       --link hadoop01:hadoop01 \
       --name acc02 cybermaggedon/accumulo:1.7.2
 
@@ -256,7 +251,6 @@ HDFS for state, so no volumes needed.
       -e SLAVE_HOSTS=10.10.10.10,10.10.10.11,10.10.10.12 \
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
-      -e DAEMONS=tserver \
       --link hadoop01:hadoop01 \
       --name acc03 cybermaggedon/accumulo:1.7.2
 
@@ -264,9 +258,6 @@ HDFS for state, so no volumes needed.
 
 The following environment variables are used to tailor the Accumulo
 deployment:
-- ```DAEMONS```: A comma-separate list of daemons to run, from ```master```,
-  ```gc```, ```monitor```, ```tserver```, ```tracer```.  Default is to run
-  all of them, useful for a stand-alone deployment.
 - ```ZOOKEEPERS```: A comma separated list of hostnames or IP addresses of
   the Zookeeper servers.  Defaults to ```zookeeper```, useful for
   a single stand-alone Zookeeper.
