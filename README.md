@@ -92,12 +92,12 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e ZOOKEEPER_MYID=1 \
       --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.9
       
-  docker run -d -i -t --ip=10.10.5.11 --net my_network \
+  docker run -d --ip=10.10.5.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=2 --name zk2 --link zk1:zk1 \
       cybermaggedon/zookeeper:3.4.9
       
-  docker run -d -i -t --ip=10.10.5.12 --net my_network \
+  docker run -d --ip=10.10.5.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=3 --name zk3 --link zk1:zk1 \
       cybermaggedon/zookeeper:3.4.9
@@ -193,13 +193,13 @@ HDFS for state, so no volumes needed.
       -v /data/zk1:/data \
       --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.9
       
-  docker run -d -i -t --ip=10.10.5.11 --net my_network \
+  docker run -d --ip=10.10.5.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=2 --name zk2 --link zk1:zk1 \
       -v /data/zk2:/data \
       cybermaggedon/zookeeper:3.4.9
       
-  docker run -d -i -t --ip=10.10.5.12 --net my_network \
+  docker run -d --ip=10.10.5.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=3 --name zk3 --link zk1:zk1 \
       -v /data/zk3:/data \
@@ -210,7 +210,7 @@ HDFS for state, so no volumes needed.
   ############################################################################
 
   # First node is master, monitor, gc, tracer, tablet server
-  docker run --rm -i -t --ip=10.10.10.10 --net my_network \
+  docker run -d --ip=10.10.10.10 --net my_network \
       -p 50095:50095 -p 9995:9995 \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
@@ -226,7 +226,7 @@ HDFS for state, so no volumes needed.
       --name acc01 cybermaggedon/accumulo:1.8.0
 
   # Two slave nodes, tablet server only
-  docker run --rm -i -t --ip=10.10.10.11 --net my_network \
+  docker run -d --ip=10.10.10.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
       -e INSTANCE_NAME=accumulo02 \
@@ -240,7 +240,7 @@ HDFS for state, so no volumes needed.
       --link hadoop01:hadoop01 \
       --name acc02 cybermaggedon/accumulo:1.8.0
 
-  docker run --rm -i -t --ip=10.10.10.12 --net my_network \
+  docker run -d --ip=10.10.10.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
       -e INSTANCE_NAME=accumulo03 \
