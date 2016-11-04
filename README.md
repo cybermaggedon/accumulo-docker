@@ -320,3 +320,4 @@ The values Accumulo developers recommend are:
   - ```SORT_BUFFER_SIZE```: 200M
   - ```WALOG_MAX_SIZE```: 1G
 
+Source at <http://github.com/cybermaggedon/accumulo-docker>.
