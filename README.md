@@ -5,15 +5,14 @@ Accumulo, no persistence.  Accumulo uses hostname 'hadoop' for HDFS by default,
 and 'zookeeper' for Zookeeper.
 
 ```
-
   # Start Hadoop
-  docker run --rm --name hadoop cybermaggedon/hadoop:2.7.3
+  docker run -d --name hadoop cybermaggedon/hadoop:2.7.3
 
   # Start Zookeeper
-  docker run --rm --name zookeeper cybermaggedon/zookeeper:3.4.9
+  docker run -d --name zookeeper cybermaggedon/zookeeper:3.4.9
 
   # Start Accumulo, linking to other containers.
-  docker run --rm --name accumulo -p 9995:9995 -p 9997:9997 -p 9999:9999 \
+  docker run -d --name accumulo -p 9995:9995 -p 9997:9997 -p 9999:9999 \
         --link hadoop:hadoop \
 	--link zookeeper:zookeeper \
         cybermaggedon/accumulo:1.8.0
@@ -23,7 +22,6 @@ and 'zookeeper' for Zookeeper.
 Default Accumulo root password is `accumulo`.  To check it works:
 
 ```
-
   % docker ps | grep accumulo
   % docker exec -it insert-container-ID bash
   # /usr/local/accumulo/bin/accumulo shell -u root -p accumulo
@@ -39,16 +37,15 @@ persistent volumes.
 e.g.
 
 ```
-
   # Start Hadoop
-  docker run --rm --name hadoop -v /data/hadoop:/data cybermaggedon/hadoop:2.7.3
+  docker run -d --name hadoop -v /data/hadoop:/data cybermaggedon/hadoop:2.7.3
 
   # Start Zookeeper
-  docker run --rm --name zookeeper -v /data/zookeeper:/data \
+  docker run -d --name zookeeper -v /data/zookeeper:/data \
         cybermaggedon/zookeeper:3.4.9
 
   # Start Accumulo, linking to other containers.
-  docker run --rm --name accumulo  -p 9995:9995 -p 9997:9997 -p 9999:9999 \
+  docker run -d --name accumulo  -p 9995:9995 -p 9997:9997 -p 9999:9999 \
         --link hadoop:hadoop \
         --link zookeeper:zookeeper \
 	cybermaggedon/accumulo:1.8.0
@@ -60,7 +57,6 @@ names or addresses that are provided to containers.  Easiest way
 is to set up a user-defined network and allocate the IP addresses manually.
 
 ```
-
   ############################################################################
   # Create network
   ############################################################################
@@ -161,7 +157,6 @@ If you want persistence, Hadoop and Zookeeper need a volume.  Accumulo uses
 HDFS for state, so no volumes needed.
 
 ```
-
   ############################################################################
   # Create network
   ############################################################################
