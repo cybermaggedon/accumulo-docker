@@ -313,7 +313,8 @@ The values Accumulo developers recommend are:
   - ```CACHE_INDEX_SIZE```: 80M
   - ```SORT_BUFFER_SIZE```: 50M
   - ```WALOG_MAX_SIZE```: 512M.
-- 3GB: MEMORY_MAPS_MAX: 1G
+- 3GB:
+  - ```MEMORY_MAPS_MAX```: 1G
   - ```CACHE_DATA_SIZE```: 128M
   - ```CACHE_INDEX_SIZE```: 128M
   - ```SORT_BUFFER_SIZE```: 200M
