@@ -1,20 +1,112 @@
 #!/bin/bash
 
-if [ ! -f /accumulo/.init.accumulo ]
+rewrite() {
+    cat $1 | \
+	sed \
+	    -e "s#@ZOOKEEPERS@#${ZOOKEEPERS}#" \
+	    -e "s#@HDFS_VOLUMES@#${HDFS_VOLUMES}#" \
+	    -e "s#@SECRET@#${SECRET}#" \
+	    -e "s#@MEMORY_MAPS_MAX@#${MEMORY_MAPS_MAX}#" \
+	    -e "s#@CACHE_DATA_SIZE@#${CACHE_DATA_SIZE}#" \
+	    -e "s#@CACHE_INDEX_SIZE@#${CACHE_INDEX_SIZE}#" \
+	    -e "s#@SORT_BUFFER_SIZE@#${SORT_BUFFER_SIZE}#" \
+	    -e "s#@WALOG_MAX_SIZE@#${WALOG_MAX_SIZE}#" \
+	    > $1.tmp
+    mv -f $1.tmp $1
+}
+
+# Default memory allocations
+MEMORY_MAPS_MAX=${MEMORY_MAPS_MAX:-8M}
+CACHE_DATA_SIZE=${CACHE_DATA_SIZE:-2M}
+CACHE_INDEX_SIZE=${CACHE_INDEX_SIZE:-2M}
+SORT_BUFFER_SIZE=${SORT_BUFFER_SIZE:-5M}
+WALOG_MAX_SIZE=${WALOG_MAX_SIZE:-5M}
+
+ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
+MY_HOSTNAME=${MY_HOSTNAME:-localhost}
+HDFS_VOLUMES=${HDFS_VOLUMES:-hdfs://hadoop:9000/accumulo}
+NAMENODE_URI=${NAMENODE_URI:-}
+INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
+SECRET=${SECRET:-accumulo}
+ACCUMULO_INIT=${ACCUMULO_INIT:-${HDFS_VOLUMES}_init}
+
+DAEMONS=${DAEMONS:-gc,master,tserver,monitor,tracer}
+
+GC_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
+MASTER_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
+SLAVE_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
+MONITOR_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
+TRACER_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
+
+. /usr/local/accumulo/conf/accumulo-env.sh
+
+rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
+
+(
+    for v in $(echo ${GC_HOSTS} | sed 's/,/ /g')
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/gc
+
+(
+    for v in $(echo ${MASTER_HOSTS} | sed 's/,/ /g')
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/masters
+
+(
+    for v in $(echo ${SLAVE_HOSTS} | sed 's/,/ /g')
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/slaves
+
+(
+    for v in $(echo ${MONITOR_HOSTS} | sed 's/,/ /g')
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/monitor
+
+(
+    for v in $(echo ${TRACER_HOSTS} | sed 's/,/ /g')
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/tracers
+
+(
+  echo "<configuration>"
+  echo "  <property>"
+  echo "    <name>fs.defaultFS</name>"
+  echo "    <value>${NAMENODE_URI}</value>"
+  echo "  </property>"
+  echo "</configuration>"
+) > /usr/local/hadoop/etc/hadoop/core-site.xml
+
+/usr/local/hadoop/bin/hdfs dfs -ls ${ACCUMULO_INIT}
+if [ $? -ne 0 ]
 then
     echo 'Initialise accumulo...'
-    /usr/local/accumulo/bin/accumulo init --instance-name accumulo --password accumulo
-    mkdir -p /data
-    touch /accumulo/.init.accumulo
+    /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
+				     --password ${SECRET} --clear-instance-name
+    /usr/local/hadoop/bin/hdfs dfs -put /dev/null ${ACCUMULO_INIT}
 fi
 
-uname -n > /usr/local/accumulo/conf/gc
-uname -n > /usr/local/accumulo/conf/masters
-uname -n > /usr/local/accumulo/conf/monitor
-uname -n > /usr/local/accumulo/conf/slaves
-uname -n > /usr/local/accumulo/conf/tracers
-
-/usr/local/accumulo/bin/start-all.sh
+(
+    for v in $(echo ${DAEMONS} | sed 's/,/ /g')
+    do
+	echo Starting $v...
+	if [ "$v" == master ]
+	then
+	    /usr/local/accumulo/bin/accumulo \
+		org.apache.accumulo.master.state.SetGoalState NORMAL
+	fi
+	/usr/local/accumulo/bin/start-daemon.sh ${MY_HOSTNAME} $v
+    done
+)
 
 while true
 do
