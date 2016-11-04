@@ -9,7 +9,7 @@ and 'zookeeper' for Zookeeper.
   docker run -d --name hadoop cybermaggedon/hadoop:2.7.3
 
   # Start Zookeeper
-  docker run -d --name zookeeper cybermaggedon/zookeeper:3.4.9b
+  docker run -d --name zookeeper cybermaggedon/zookeeper:3.4.9d
 
   # Start Accumulo, linking to other containers.
   docker run -d --name accumulo -p 9995:9995 -p 9997:9997 -p 9999:9999 \
@@ -42,7 +42,7 @@ e.g.
 
   # Start Zookeeper
   docker run -d --name zookeeper -v /data/zookeeper:/data \
-        cybermaggedon/zookeeper:3.4.9b
+        cybermaggedon/zookeeper:3.4.9d
 
   # Start Accumulo, linking to other containers.
   docker run -d --name accumulo  -p 9995:9995 -p 9997:9997 -p 9999:9999 \
@@ -90,17 +90,17 @@ is to set up a user-defined network and allocate the IP addresses manually.
   docker run -d --ip=10.10.5.10 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=1 \
-      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.9b
+      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.9d
       
   docker run -d --ip=10.10.5.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=2 --name zk2 --link zk1:zk1 \
-      cybermaggedon/zookeeper:3.4.9b
+      cybermaggedon/zookeeper:3.4.9d
       
   docker run -d --ip=10.10.5.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=3 --name zk3 --link zk1:zk1 \
-      cybermaggedon/zookeeper:3.4.9b
+      cybermaggedon/zookeeper:3.4.9d
 
   ############################################################################
   # Accumulo, 3 nodes
@@ -188,19 +188,19 @@ HDFS for state, so no volumes needed.
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=1 \
       -v /data/zk1:/data \
-      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.9b
+      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.9d
       
   docker run -d --ip=10.10.5.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=2 --name zk2 --link zk1:zk1 \
       -v /data/zk2:/data \
-      cybermaggedon/zookeeper:3.4.9b
+      cybermaggedon/zookeeper:3.4.9d
       
   docker run -d --ip=10.10.5.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=3 --name zk3 --link zk1:zk1 \
       -v /data/zk3:/data \
-      cybermaggedon/zookeeper:3.4.9b
+      cybermaggedon/zookeeper:3.4.9d
 
   ############################################################################
   # Accumulo, 3 nodes

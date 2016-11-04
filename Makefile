@@ -1,6 +1,6 @@
 
 REPOSITORY=cybermaggedon/accumulo
-VERSION=1.8.0b
+VERSION=1.8.0d
 
 SUDO=
 BUILD_ARGS=
