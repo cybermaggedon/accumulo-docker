@@ -48,35 +48,40 @@ TRACER_HOSTS=${TRACER_HOSTS:-${MY_HOSTNAME}}
 rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
 
 (
-    for v in $(echo ${GC_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${GC_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
 ) > /usr/local/accumulo/conf/gc
 
 (
-    for v in $(echo ${MASTER_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${MASTER_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
 ) > /usr/local/accumulo/conf/masters
 
 (
-    for v in $(echo ${SLAVE_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${SLAVE_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
 ) > /usr/local/accumulo/conf/slaves
 
 (
-    for v in $(echo ${MONITOR_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${MONITOR_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
 ) > /usr/local/accumulo/conf/monitor
 
 (
-    for v in $(echo ${TRACER_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${TRACER_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
