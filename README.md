@@ -15,7 +15,7 @@ and 'zookeeper' for Zookeeper.
   docker run -d --name accumulo -p 9995:9995 -p 9997:9997 -p 9999:9999 \
         --link hadoop:hadoop \
 	--link zookeeper:zookeeper \
-        cybermaggedon/accumulo:1.8.0b
+        cybermaggedon/accumulo:1.8.0d
 
 ```
 
@@ -48,7 +48,7 @@ e.g.
   docker run -d --name accumulo  -p 9995:9995 -p 9997:9997 -p 9999:9999 \
         --link hadoop:hadoop \
         --link zookeeper:zookeeper \
-	cybermaggedon/accumulo:1.8.0b
+	cybermaggedon/accumulo:1.8.0d
 
 ```
 
@@ -117,7 +117,7 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc01 cybermaggedon/accumulo:1.8.0b
+      --name acc01 cybermaggedon/accumulo:1.8.0d
 
   docker run -d --ip=10.10.10.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
@@ -130,7 +130,7 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc02 cybermaggedon/accumulo:1.8.0b
+      --name acc02 cybermaggedon/accumulo:1.8.0d
 
   docker run -d --ip=10.10.10.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
@@ -143,7 +143,7 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc03 cybermaggedon/accumulo:1.8.0b
+      --name acc03 cybermaggedon/accumulo:1.8.0d
 
 ```
 
@@ -219,7 +219,7 @@ HDFS for state, so no volumes needed.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc01 cybermaggedon/accumulo:1.8.0b
+      --name acc01 cybermaggedon/accumulo:1.8.0d
 
   # Two slave nodes, tablet server only
   docker run -d --ip=10.10.10.11 --net my_network \
@@ -233,7 +233,7 @@ HDFS for state, so no volumes needed.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc02 cybermaggedon/accumulo:1.8.0b
+      --name acc02 cybermaggedon/accumulo:1.8.0d
 
   docker run -d --ip=10.10.10.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
@@ -246,7 +246,7 @@ HDFS for state, so no volumes needed.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc03 cybermaggedon/accumulo:1.8.0b
+      --name acc03 cybermaggedon/accumulo:1.8.0d
 
 ```
 
