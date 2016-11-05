@@ -22,8 +22,13 @@ CACHE_INDEX_SIZE=${CACHE_INDEX_SIZE:-2M}
 SORT_BUFFER_SIZE=${SORT_BUFFER_SIZE:-5M}
 WALOG_MAX_SIZE=${WALOG_MAX_SIZE:-5M}
 
+MY_IP=$(/usr/sbin/ifconfig | grep 'inet[^6]' | awk '{print $2}' |
+	    sed 's/addr://' | grep -v 127.0.0.1 | grep -v 0.0.0.0 |
+	    head -n 1)
+echo My IP is ${MY_IP}.
+
 ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
-MY_HOSTNAME=${MY_HOSTNAME:-localhost}
+MY_HOSTNAME=${MY_HOSTNAME:-${MY_IP}}
 HDFS_VOLUMES=${HDFS_VOLUMES:-hdfs://hadoop:9000/accumulo}
 NAMENODE_URI=${NAMENODE_URI:-}
 INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
@@ -31,45 +36,50 @@ SECRET=${SECRET:-accumulo}
 ACCUMULO_INIT=${ACCUMULO_INIT:-${HDFS_VOLUMES}_init}
 
 GC_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
-MASTER_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
-SLAVE_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
-MONITOR_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
-TRACER_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
+MASTER_HOSTS=${MASTER_HOSTS:-${MY_HOSTNAME}}
+SLAVE_HOSTS=${SLAVE_HOSTS:-${MY_HOSTNAME}}
+MONITOR_HOSTS=${MONITOR_HOSTS:-${MY_HOSTNAME}}
+TRACER_HOSTS=${TRACER_HOSTS:-${MY_HOSTNAME}}
 
 . /usr/local/accumulo/conf/accumulo-env.sh
 
 rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
 
 (
-    for v in $(echo ${GC_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${GC_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
 ) > /usr/local/accumulo/conf/gc
 
 (
-    for v in $(echo ${MASTER_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${MASTER_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
 ) > /usr/local/accumulo/conf/masters
 
 (
-    for v in $(echo ${SLAVE_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${SLAVE_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
 ) > /usr/local/accumulo/conf/slaves
 
 (
-    for v in $(echo ${MONITOR_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${MONITOR_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
 ) > /usr/local/accumulo/conf/monitor
 
 (
-    for v in $(echo ${TRACER_HOSTS} | sed 's/,/ /g')
+    for v in $(echo ${TRACER_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
     do
 	echo $v
     done
