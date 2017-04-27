@@ -30,7 +30,7 @@ echo My IP is ${MY_IP}.
 ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
 MY_HOSTNAME=${MY_HOSTNAME:-${MY_IP}}
 HDFS_VOLUMES=${HDFS_VOLUMES:-hdfs://hadoop:9000/accumulo}
-NAMENODE_URI=${NAMENODE_URI:-}
+NAMENODE_URI=${NAMENODE_URI:-hdfs://hadoop:9000/}
 INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
 SECRET=${SECRET:-accumulo}
 ACCUMULO_INIT=${ACCUMULO_INIT:-${HDFS_VOLUMES}_init}
@@ -112,3 +112,9 @@ do
     sleep 100000
 done
 
+#<configuration>
+#  <property>
+#    <name>fs.defaultFS</name>
+#    <value>hdfs://hadoop:9000/</value>
+#  </property>
+#</configuration>

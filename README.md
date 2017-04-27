@@ -6,16 +6,16 @@ and 'zookeeper' for Zookeeper.
 
 ```
   # Start Hadoop
-  docker run -d --name hadoop cybermaggedon/hadoop:2.7.3
+  docker run -d --name hadoop cybermaggedon/hadoop:2.8.0
 
   # Start Zookeeper
-  docker run -d --name zookeeper cybermaggedon/zookeeper:3.4.9d
+  docker run -d --name zookeeper cybermaggedon/zookeeper:3.4.10
 
   # Start Accumulo, linking to other containers.
   docker run -d --name accumulo -p 9995:9995 -p 9997:9997 -p 9999:9999 \
         --link hadoop:hadoop \
 	--link zookeeper:zookeeper \
-        cybermaggedon/accumulo:1.8.0d
+        cybermaggedon/accumulo:1.8.1
 
 ```
 
@@ -38,17 +38,17 @@ e.g.
 
 ```
   # Start Hadoop
-  docker run -d --name hadoop -v /data/hadoop:/data cybermaggedon/hadoop:2.7.3
+  docker run -d --name hadoop -v /data/hadoop:/data cybermaggedon/hadoop:2.8.0
 
   # Start Zookeeper
   docker run -d --name zookeeper -v /data/zookeeper:/data \
-        cybermaggedon/zookeeper:3.4.9d
+        cybermaggedon/zookeeper:3.4.10
 
   # Start Accumulo, linking to other containers.
   docker run -d --name accumulo  -p 9995:9995 -p 9997:9997 -p 9999:9999 \
         --link hadoop:hadoop \
         --link zookeeper:zookeeper \
-	cybermaggedon/accumulo:1.8.0d
+	cybermaggedon/accumulo:1.8.1
 
 ```
 
@@ -71,18 +71,18 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e DAEMONS=namenode,datanode,secondarynamenode \
       --name=hadoop01 \
       -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 9000:9000 \
-      cybermaggedon/hadoop:2.7.3
+      cybermaggedon/hadoop:2.8.0
 
   # Datanodes
   docker run -d --ip=10.10.6.4 --net my_network --link hadoop01:hadoop01 \
       -e DAEMONS=datanode -e NAMENODE_URI=hdfs://hadoop01:9000 \
       --name=hadoop02 \
-      cybermaggedon/hadoop:2.7.3
+      cybermaggedon/hadoop:2.8.0
 
   docker run -d --ip=10.10.6.5 --net my_network --link hadoop01:hadoop01 \
       -e DAEMONS=datanode -e NAMENODE_URI=hdfs://hadoop01:9000 \
       --name=hadoop03 \
-      cybermaggedon/hadoop:2.7.3
+      cybermaggedon/hadoop:2.8.0
 
   ############################################################################
   # Zookeeper cluster, 3 nodes.
@@ -90,17 +90,17 @@ is to set up a user-defined network and allocate the IP addresses manually.
   docker run -d --ip=10.10.5.10 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=1 \
-      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.9d
+      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.10
       
   docker run -d --ip=10.10.5.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=2 --name zk2 --link zk1:zk1 \
-      cybermaggedon/zookeeper:3.4.9d
+      cybermaggedon/zookeeper:3.4.10
       
   docker run -d --ip=10.10.5.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=3 --name zk3 --link zk1:zk1 \
-      cybermaggedon/zookeeper:3.4.9d
+      cybermaggedon/zookeeper:3.4.10
 
   ############################################################################
   # Accumulo, 3 nodes
@@ -109,7 +109,7 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -p 50095:50095 -p 9995:9995 \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e NAMENODE_URI= \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
       -e MY_HOSTNAME=10.10.10.10 \
       -e GC_HOSTS=10.10.10.10 \
       -e MASTER_HOSTS=10.10.10.10 \
@@ -117,12 +117,12 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc01 cybermaggedon/accumulo:1.8.0d
+      --name acc01 cybermaggedon/accumulo:1.8.1
 
   docker run -d --ip=10.10.10.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e NAMENODE_URI= \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
       -e MY_HOSTNAME=10.10.10.11 \
       -e GC_HOSTS=10.10.10.10 \
       -e MASTER_HOSTS=10.10.10.10 \
@@ -130,12 +130,12 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc02 cybermaggedon/accumulo:1.8.0d
+      --name acc02 cybermaggedon/accumulo:1.8.1
 
   docker run -d --ip=10.10.10.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e NAMENODE_URI= \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
       -e MY_HOSTNAME=10.10.10.12 \
       -e GC_HOSTS=10.10.10.10 \
       -e MASTER_HOSTS=10.10.10.10 \
@@ -143,7 +143,7 @@ is to set up a user-defined network and allocate the IP addresses manually.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc03 cybermaggedon/accumulo:1.8.0d
+      --name acc03 cybermaggedon/accumulo:1.8.1
 
 ```
 
@@ -166,20 +166,20 @@ HDFS for state, so no volumes needed.
       --name=hadoop01 \
       -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 9000:9000 \
       -v /data/hadoop01:/data \
-      cybermaggedon/hadoop:2.7.3
+      cybermaggedon/hadoop:2.8.0
 
   # Datanodes
   docker run -d --ip=10.10.6.4 --net my_network --link hadoop01:hadoop01 \
       -e DAEMONS=datanode -e NAMENODE_URI=hdfs://hadoop01:9000 \
       --name=hadoop02 \
       -v /data/hadoop02:/data \
-      cybermaggedon/hadoop:2.7.3
+      cybermaggedon/hadoop:2.8.0
 
   docker run -d --ip=10.10.6.5 --net my_network --link hadoop01:hadoop01 \
       -e DAEMONS=datanode -e NAMENODE_URI=hdfs://hadoop01:9000 \
       --name=hadoop03 \
       -v /data/hadoop03:/data \
-      cybermaggedon/hadoop:2.7.3
+      cybermaggedon/hadoop:2.8.0
 
   ############################################################################
   # Zookeeper cluster, 3 nodes.
@@ -188,19 +188,19 @@ HDFS for state, so no volumes needed.
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=1 \
       -v /data/zk1:/data \
-      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.9d
+      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.10
       
   docker run -d --ip=10.10.5.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=2 --name zk2 --link zk1:zk1 \
       -v /data/zk2:/data \
-      cybermaggedon/zookeeper:3.4.9d
+      cybermaggedon/zookeeper:3.4.10
       
   docker run -d --ip=10.10.5.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e ZOOKEEPER_MYID=3 --name zk3 --link zk1:zk1 \
       -v /data/zk3:/data \
-      cybermaggedon/zookeeper:3.4.9d
+      cybermaggedon/zookeeper:3.4.10
 
   ############################################################################
   # Accumulo, 3 nodes
@@ -211,7 +211,7 @@ HDFS for state, so no volumes needed.
       -p 50095:50095 -p 9995:9995 \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e NAMENODE_URI= \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
       -e MY_HOSTNAME=10.10.10.10 \
       -e GC_HOSTS=10.10.10.10 \
       -e MASTER_HOSTS=10.10.10.10 \
@@ -219,13 +219,13 @@ HDFS for state, so no volumes needed.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc01 cybermaggedon/accumulo:1.8.0d
+      --name acc01 cybermaggedon/accumulo:1.8.1
 
   # Two slave nodes, tablet server only
   docker run -d --ip=10.10.10.11 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e NAMENODE_URI= \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
       -e MY_HOSTNAME=10.10.10.11 \
       -e GC_HOSTS=10.10.10.10 \
       -e MASTER_HOSTS=10.10.10.10 \
@@ -233,12 +233,12 @@ HDFS for state, so no volumes needed.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc02 cybermaggedon/accumulo:1.8.0d
+      --name acc02 cybermaggedon/accumulo:1.8.1
 
   docker run -d --ip=10.10.10.12 --net my_network \
       -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
       -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
-      -e NAMENODE_URI= \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
       -e MY_HOSTNAME=10.10.10.12 \
       -e GC_HOSTS=10.10.10.10 \
       -e MASTER_HOSTS=10.10.10.10 \
@@ -246,7 +246,7 @@ HDFS for state, so no volumes needed.
       -e MONITOR_HOSTS=10.10.10.10 \
       -e TRACER_HOSTS=10.10.10.10 \
       --link hadoop01:hadoop01 \
-      --name acc03 cybermaggedon/accumulo:1.8.0d
+      --name acc03 cybermaggedon/accumulo:1.8.1
 
 ```
 
@@ -258,6 +258,8 @@ deployment:
 - ```HDFS_VOLUMES```: A comma separated list of HDFS URIs for volumes to
   store Accumulo data.  I've only tested with one volume.  Defaults
   to ```hdfs://hadoop:9000/accumulo```.
+- ```NAMENODE_URI```: The URI of the Hadoop name-node.
+  Defaults to ```hdfs://hadoop:9000/accumulo```.
 - ```INSTANCE_NAME```: A unique name for this Accumulo instance.  Defaults
   to ```accumulo```.
 - ```MY_HOSTNAME```: Hostname or IP address to share with other nodes in

@@ -1,7 +1,9 @@
 
-FROM fedora:24
+FROM fedora:25
 
-MAINTAINER cybermaggedon
+ARG ZOOKEEPER_VERSION=3.4.10
+ARG HADOOP_VERSION=2.8.0
+ARG ACCUMULO_VERSION=1.8.1
 
 RUN echo -e "\n* soft nofile 65536\n* hard nofile 65536" >> /etc/security/limits.conf
 
@@ -11,16 +13,16 @@ RUN dnf install -y procps-ng hostname
 RUN dnf install -y which
 
 # hadoop
-ADD hadoop-2.7.3.tar.gz /usr/local/
-RUN ln -s /usr/local/hadoop-2.7.3 /usr/local/hadoop
+ADD hadoop-${HADOOP_VERSION}.tar.gz /usr/local/
+RUN ln -s /usr/local/hadoop-${HADOOP_VERSION} /usr/local/hadoop
 
 # Zookeeper
-ADD zookeeper-3.4.9.tar.gz /usr/local/
-RUN ln -s /usr/local/zookeeper-3.4.9 /usr/local/zookeeper
+ADD zookeeper-${ZOOKEEPER_VERSION}.tar.gz /usr/local/
+RUN ln -s /usr/local/zookeeper-${ZOOKEEPER_VERSION} /usr/local/zookeeper
 
 # Accumulo
-ADD accumulo-1.8.0-bin.tar.gz /usr/local/
-RUN ln -s /usr/local/accumulo-1.8.0 /usr/local/accumulo
+ADD accumulo-${ACCUMULO_VERSION}-bin.tar.gz /usr/local/
+RUN ln -s /usr/local/accumulo-${ACCUMULO_VERSION} /usr/local/accumulo
 
 # Diagnostic tools :/
 RUN dnf install -y net-tools
