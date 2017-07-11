@@ -1,0 +1,112 @@
+#!/bin/bash
+
+rewrite() {
+    cat $1 | \
+	sed \
+	    -e "s#@ZOOKEEPERS@#${ZOOKEEPERS}#" \
+	    -e "s#@HDFS_VOLUMES@#${HDFS_VOLUMES}#" \
+	    -e "s#@SECRET@#${SECRET}#" \
+	    -e "s#@MEMORY_MAPS_MAX@#${MEMORY_MAPS_MAX}#" \
+	    -e "s#@CACHE_DATA_SIZE@#${CACHE_DATA_SIZE}#" \
+	    -e "s#@CACHE_INDEX_SIZE@#${CACHE_INDEX_SIZE}#" \
+	    -e "s#@SORT_BUFFER_SIZE@#${SORT_BUFFER_SIZE}#" \
+	    -e "s#@WALOG_MAX_SIZE@#${WALOG_MAX_SIZE}#" \
+	    > $1.tmp
+    mv -f $1.tmp $1
+}
+
+# Default memory allocations
+MEMORY_MAPS_MAX=${MEMORY_MAPS_MAX:-8M}
+CACHE_DATA_SIZE=${CACHE_DATA_SIZE:-2M}
+CACHE_INDEX_SIZE=${CACHE_INDEX_SIZE:-2M}
+SORT_BUFFER_SIZE=${SORT_BUFFER_SIZE:-5M}
+WALOG_MAX_SIZE=${WALOG_MAX_SIZE:-5M}
+
+MY_IP=$(/usr/sbin/ifconfig | grep 'inet[^6]' | awk '{print $2}' |
+	    sed 's/addr://' | grep -v 127.0.0.1 | grep -v 0.0.0.0 |
+	    head -n 1)
+echo My IP is ${MY_IP}.
+
+ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
+MY_HOSTNAME=${MY_HOSTNAME:-${MY_IP}}
+HDFS_VOLUMES=${HDFS_VOLUMES:-hdfs://hadoop:9000/accumulo}
+NAMENODE_URI=${NAMENODE_URI:-hdfs://hadoop:9000/}
+INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
+SECRET=${SECRET:-accumulo}
+ACCUMULO_INIT=${ACCUMULO_INIT:-${HDFS_VOLUMES}_init}
+
+DAEMONS=${DAEMONS:-gc,master,tserver,monitor,tracer}
+
+GC_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
+MASTER_HOSTS=${MASTER_HOSTS:-${MY_HOSTNAME}}
+SLAVE_HOSTS=${SLAVE_HOSTS:-${MY_HOSTNAME}}
+MONITOR_HOSTS=${MONITOR_HOSTS:-${MY_HOSTNAME}}
+TRACER_HOSTS=${TRACER_HOSTS:-${MY_HOSTNAME}}
+
+. /usr/local/accumulo/conf/accumulo-env.sh
+
+rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
+
+(
+    for v in $(echo ${GC_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/gc
+
+(
+    for v in $(echo ${MASTER_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/masters
+
+(
+    for v in $(echo ${SLAVE_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/slaves
+
+(
+    for v in $(echo ${MONITOR_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/monitor
+
+(
+    for v in $(echo ${TRACER_HOSTS} | 
+		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
+    do
+	echo $v
+    done
+) > /usr/local/accumulo/conf/tracers
+
+(
+  echo "<configuration>"
+  echo "  <property>"
+  echo "    <name>fs.defaultFS</name>"
+  echo "    <value>${NAMENODE_URI}</value>"
+  echo "  </property>"
+  echo "</configuration>"
+) > /usr/local/hadoop/etc/hadoop/core-site.xml
+
+/usr/local/hadoop/bin/hdfs dfs -ls ${ACCUMULO_INIT}
+if [ $? -ne 0 ]
+then
+    echo 'Initialise accumulo...'
+    /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
+				     --password ${SECRET} --clear-instance-name
+    /usr/local/hadoop/bin/hdfs dfs -put /dev/null ${ACCUMULO_INIT}
+fi
+
+. /usr/local/accumulo/bin/config.sh
+. /usr/local/accumulo/bin/config-server.sh
+
+/usr/local/accumulo/bin/accumulo $1 --address 0.0.0.0
+

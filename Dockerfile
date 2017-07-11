@@ -33,6 +33,7 @@ ENV PATH $PATH:$ACCUMULO_HOME/bin
 ADD accumulo/* $ACCUMULO_HOME/conf/
 
 ADD start-accumulo /start-accumulo
+ADD start-process /start-process
 
 CMD /start-accumulo
 

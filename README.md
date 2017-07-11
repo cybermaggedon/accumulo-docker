@@ -249,6 +249,175 @@ HDFS for state, so no volumes needed.
       --name acc03 cybermaggedon/accumulo:1.8.1
 
 ```
+Now, the above configuration has a problem, in that it uses the default
+Accumulo startup.  This runs all of the Accumulo processes in the background
+inside each container.  If Accumulo processes fail, there's no restart.  The
+Docker Way to do this is to run each Accumulo process in its own container,
+so that when the process fails, the container fails, which can be detected
+and restarted.  To do this, I invoke /start-process and provide the name of
+an Accumulo process to stat.
+
+```
+
+  ############################################################################
+  # Create network
+  ############################################################################
+  docker network create --driver=bridge --subnet=10.10.0.0/16 my_network
+
+  ############################################################################
+  # HDFS
+  ############################################################################
+
+  # Namenode
+  docker run -d --ip=10.10.6.3 --net my_network \
+      -e DAEMONS=namenode,datanode,secondarynamenode \
+      --name=hadoop01 \
+      -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 9000:9000 \
+      -v /data/hadoop01:/data \
+      cybermaggedon/hadoop:2.8.0
+
+  # Datanodes
+  docker run -d --ip=10.10.6.4 --net my_network --link hadoop01:hadoop01 \
+      -e DAEMONS=datanode -e NAMENODE_URI=hdfs://hadoop01:9000 \
+      --name=hadoop02 \
+      -v /data/hadoop02:/data \
+      cybermaggedon/hadoop:2.8.0
+
+  docker run -d --ip=10.10.6.5 --net my_network --link hadoop01:hadoop01 \
+      -e DAEMONS=datanode -e NAMENODE_URI=hdfs://hadoop01:9000 \
+      --name=hadoop03 \
+      -v /data/hadoop03:/data \
+      cybermaggedon/hadoop:2.8.0
+
+  ############################################################################
+  # Zookeeper cluster, 3 nodes.
+  ############################################################################
+  docker run -d --ip=10.10.5.10 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e ZOOKEEPER_MYID=1 \
+      -v /data/zk1:/data \
+      --name zk1 -p 2181:2181 cybermaggedon/zookeeper:3.4.10
+      
+  docker run -d --ip=10.10.5.11 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e ZOOKEEPER_MYID=2 --name zk2 --link zk1:zk1 \
+      -v /data/zk2:/data \
+      cybermaggedon/zookeeper:3.4.10
+      
+  docker run -d --ip=10.10.5.12 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e ZOOKEEPER_MYID=3 --name zk3 --link zk1:zk1 \
+      -v /data/zk3:/data \
+      cybermaggedon/zookeeper:3.4.10
+
+  ############################################################################
+  # Accumulo, 3 nodes
+  ############################################################################
+
+  # Master
+  docker run -d --ip=10.10.10.10 --net my_network \
+      -p 50095:50095 \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
+      -e MY_HOSTNAME=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e GC_HOSTS=10.10.10.11 \
+      -e SLAVE_HOSTS=10.10.10.12,10.10.10.13,10.10.10.14 \
+      -e MONITOR_HOSTS=10.10.10.15 \
+      -e TRACER_HOSTS=10.10.10.16 \
+      --link hadoop01:hadoop01 \
+      --name acc-master cybermaggedon/accumulo:1.8.1a /start-process master
+
+  # GC
+  docker run -d --ip=10.10.10.11 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
+      -e MY_HOSTNAME=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e GC_HOSTS=10.10.10.11 \
+      -e SLAVE_HOSTS=10.10.10.12,10.10.10.13,10.10.10.14 \
+      -e MONITOR_HOSTS=10.10.10.15 \
+      -e TRACER_HOSTS=10.10.10.16 \
+      --link hadoop01:hadoop01 \
+      --name acc-gc cybermaggedon/accumulo:1.8.1a /start-process gc
+
+  # Slave 1
+  docker run -d --ip=10.10.10.12 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
+      -e MY_HOSTNAME=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e GC_HOSTS=10.10.10.11 \
+      -e SLAVE_HOSTS=10.10.10.12,10.10.10.13,10.10.10.14 \
+      -e MONITOR_HOSTS=10.10.10.15 \
+      -e TRACER_HOSTS=10.10.10.16 \
+      --link hadoop01:hadoop01 \
+      --name acc-slave1 cybermaggedon/accumulo:1.8.1a /start-process tserver
+
+  # Slave 2
+  docker run -d --ip=10.10.10.13 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
+      -e MY_HOSTNAME=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e GC_HOSTS=10.10.10.11 \
+      -e SLAVE_HOSTS=10.10.10.12,10.10.10.13,10.10.10.14 \
+      -e MONITOR_HOSTS=10.10.10.15 \
+      -e TRACER_HOSTS=10.10.10.16 \
+      --link hadoop01:hadoop01 \
+      --name acc-slave2 cybermaggedon/accumulo:1.8.1a /start-process tserver
+
+  # Slave 3
+  docker run -d --ip=10.10.10.14 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
+      -e MY_HOSTNAME=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e GC_HOSTS=10.10.10.11 \
+      -e SLAVE_HOSTS=10.10.10.12,10.10.10.13,10.10.10.14 \
+      -e MONITOR_HOSTS=10.10.10.15 \
+      -e TRACER_HOSTS=10.10.10.16 \
+      --link hadoop01:hadoop01 \
+      --name acc-slave3 cybermaggedon/accumulo:1.8.1a /start-process tserver
+
+  # Monitor - this has the web server.
+  docker run -d --ip=10.10.10.15 --net my_network \
+      -p 9995:9995 \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
+      -e MY_HOSTNAME=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e GC_HOSTS=10.10.10.11 \
+      -e SLAVE_HOSTS=10.10.10.12,10.10.10.13,10.10.10.14 \
+      -e MONITOR_HOSTS=10.10.10.15 \
+      -e TRACER_HOSTS=10.10.10.16 \
+      --link hadoop01:hadoop01 \
+      --name acc-monitor cybermaggedon/accumulo:1.8.1a /start-process monitor
+
+  docker run -d --ip=10.10.10.16 --net my_network \
+      -e ZOOKEEPERS=10.10.5.10,10.10.5.11,10.10.5.12 \
+      -e HDFS_VOLUMES=hdfs://hadoop01:9000/accumulo \
+      -e NAMENODE_URI=hdfs://hadoop01:9000/ \
+      -e MY_HOSTNAME=10.10.10.10 \
+      -e MASTER_HOSTS=10.10.10.10 \
+      -e GC_HOSTS=10.10.10.11 \
+      -e SLAVE_HOSTS=10.10.10.12,10.10.10.13,10.10.10.14 \
+      -e MONITOR_HOSTS=10.10.10.15 \
+      -e TRACER_HOSTS=10.10.10.16 \
+      --link hadoop01:hadoop01 \
+      --name acc-tracer cybermaggedon/accumulo:1.8.1a /start-process tracer
+
+```
+
+If volumes don't mount because of selinux, this command may be your friend:
+
+  ```chcon -Rt svirt_sandbox_file_t /path/of/volume```
 
 The following environment variables are used to tailor the Accumulo
 deployment:
