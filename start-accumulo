@@ -27,8 +27,13 @@ MY_IP=$(/usr/sbin/ifconfig | grep 'inet[^6]' | awk '{print $2}' |
 	    head -n 1)
 echo My IP is ${MY_IP}.
 
-ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
 MY_HOSTNAME=${MY_HOSTNAME:-${MY_IP}}
+if [ "${MY_HOSTNAME}" == MY_IP ]
+then
+    MY_HOSTNAME=${MY_IP}
+fi
+
+ZOOKEEPERS=${ZOOKEEPERS:-zookeeper:2181}
 HDFS_VOLUMES=${HDFS_VOLUMES:-hdfs://hadoop:9000/accumulo}
 NAMENODE_URI=${NAMENODE_URI:-hdfs://hadoop:9000/}
 INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
