@@ -1,8 +1,8 @@
 
-FROM fedora:25
+FROM fedora:26
 
 ARG ZOOKEEPER_VERSION=3.4.10
-ARG HADOOP_VERSION=2.8.0
+ARG HADOOP_VERSION=2.8.1
 ARG ACCUMULO_VERSION=1.8.1
 
 RUN echo -e "\n* soft nofile 65536\n* hard nofile 65536" >> /etc/security/limits.conf
