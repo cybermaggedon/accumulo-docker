@@ -1,6 +1,6 @@
 
 REPOSITORY=cybermaggedon/accumulo
-VERSION=1.8.1c
+VERSION=$(shell git describe | sed 's/^v//')
 ZOOKEEPER_VERSION=3.4.10
 HADOOP_VERSION=2.8.1
 ACCUMULO_VERSION=1.8.1
