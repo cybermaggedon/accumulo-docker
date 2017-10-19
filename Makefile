@@ -33,7 +33,7 @@ push:
 
 # Continuous deployment support
 BRANCH=master
-FILE=accumulo-version.jsonnet
+FILE=accumulo-version
 REPO=git@github.com:cybermaggedon/gaffer-docker
 
 tools: phony
