@@ -101,14 +101,40 @@ rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
   echo "</configuration>"
 ) > /usr/local/hadoop/etc/hadoop/core-site.xml
 
-/usr/local/hadoop/bin/hdfs dfs -ls ${ACCUMULO_INIT}
-if [ $? -ne 0 ]
-then
-    echo 'Initialise accumulo...'
-    /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
-				     --password ${SECRET} --clear-instance-name
-    /usr/local/hadoop/bin/hdfs dfs -put /dev/null ${ACCUMULO_INIT}
-fi
+# Loop until Accumulo is successfully initialised.
+while true
+do
+
+  /usr/local/hadoop/bin/hdfs dfs -ls /
+  if [ $? -ne 0 ]
+  then
+    echo 'Hadoop not up?'
+    sleep 10  
+    continue
+  fi
+
+  /usr/local/hadoop/bin/hdfs dfs -ls ${ACCUMULO_INIT}
+  if [ $? -eq 0 ]
+  then
+    echo 'Accumulo has been initialised.'
+    break
+  fi
+
+  echo 'Accumulo not initialised.'
+
+  echo 'Initialise accumulo...'
+  /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
+    --password ${SECRET} --clear-instance-name
+  if [ $? -ne 0 ]
+  then
+    echo Initialisation failed.
+    sleep 1
+    continue
+  fi
+
+  /usr/local/hadoop/bin/hdfs dfs -put /dev/null ${ACCUMULO_INIT}
+
+done
 
 /usr/local/accumulo/bin/start-here.sh
 
