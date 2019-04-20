@@ -1,4 +1,5 @@
-FROM fedora:28
+
+FROM fedora:29
 
 ARG ZOOKEEPER_VERSION=3.4.10
 ARG HADOOP_VERSION=2.8.1
@@ -6,10 +7,9 @@ ARG ACCUMULO_VERSION=1.8.1
 
 RUN echo -e "\n* soft nofile 65536\n* hard nofile 65536" >> /etc/security/limits.conf
 
-RUN dnf install -y tar
-RUN dnf install -y java-1.8.0-openjdk
-RUN dnf install -y procps-ng hostname
-RUN dnf install -y which
+RUN dnf update -y && dnf install -y tar && \
+    dnf install -y java-1.8.0-openjdk && dnf install -y procps-ng hostname && \
+    dnf install -y which findutils && dnf clean all
 
 # hadoop
 ADD hadoop-${HADOOP_VERSION}.tar.gz /usr/local/
