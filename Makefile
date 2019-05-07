@@ -2,8 +2,8 @@
 REPOSITORY=cybermaggedon/accumulo
 VERSION=$(shell git describe | sed 's/^v//')
 ZOOKEEPER_VERSION=3.4.14
-HADOOP_VERSION=2.9.2
-ACCUMULO_VERSION=1.9.3
+HADOOP_VERSION=3.2.0
+ACCUMULO_VERSION=2.0.0-alpha-2
 
 SUDO=
 BUILD_ARGS=--build-arg ZOOKEEPER_VERSION=${ZOOKEEPER_VERSION} \
@@ -13,8 +13,19 @@ BUILD_ARGS=--build-arg ZOOKEEPER_VERSION=${ZOOKEEPER_VERSION} \
 DOWNLOADS=accumulo-${ACCUMULO_VERSION}-bin.tar.gz \
   zookeeper-${ZOOKEEPER_VERSION}.tar.gz hadoop-${HADOOP_VERSION}.tar.gz
 
-all: ${DOWNLOADS}
+all: ${DOWNLOADS} container
+
+NATIVE_LIB=libaccumulo.so
+
+container: ${NATIVE_LIB}
 	${SUDO} docker build ${BUILD_ARGS} -t ${REPOSITORY}:${VERSION} .
+
+${NATIVE_LIB}:
+	-rm -rf accumulo-${ACCUMULO_VERSION}
+	tar xfz accumulo-${ACCUMULO_VERSION}-bin.tar.gz
+	(cd accumulo-${ACCUMULO_VERSION}; bin/accumulo-util build-native)
+	mv accumulo-${ACCUMULO_VERSION}/lib/native/libaccumulo.so .
+	rm -rf accumulo-${ACCUMULO_VERSION}
 
 # FIXME: May not be the right mirror for you.
 zookeeper-${ZOOKEEPER_VERSION}.tar.gz:
@@ -31,22 +42,5 @@ hadoop-${HADOOP_VERSION}.tar.gz:
 push:
 	${SUDO} docker push ${REPOSITORY}:${VERSION}
 
-# Continuous deployment support
-BRANCH=master
-FILE=accumulo-version
-REPO=git@github.com:cybermaggedon/gaffer-docker
 
-tools: phony
-	if [ ! -d tools ]; then \
-		git clone git@github.com:trustnetworks/cd-tools tools; \
-	fi; \
-	(cd tools; git pull)
-
-phony:
-
-bump-version: tools
-	tools/bump-version
-
-update-cluster-config: tools
-	tools/update-version-file ${BRANCH} ${VERSION} ${FILE} ${REPO}
 

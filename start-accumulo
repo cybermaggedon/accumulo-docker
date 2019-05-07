@@ -6,6 +6,7 @@ rewrite() {
 	    -e "s#@ZOOKEEPERS@#${ZOOKEEPERS}#" \
 	    -e "s#@HDFS_VOLUMES@#${HDFS_VOLUMES}#" \
 	    -e "s#@SECRET@#${SECRET}#" \
+	    -e "s#@INSTANCE_NAME@#${INSTANCE_NAME}#" \
 	    -e "s#@MEMORY_MAPS_MAX@#${MEMORY_MAPS_MAX}#" \
 	    -e "s#@CACHE_DATA_SIZE@#${CACHE_DATA_SIZE}#" \
 	    -e "s#@CACHE_INDEX_SIZE@#${CACHE_INDEX_SIZE}#" \
@@ -42,55 +43,9 @@ ACCUMULO_INIT=${ACCUMULO_INIT:-${HDFS_VOLUMES}_init}
 
 DAEMONS=${DAEMONS:-gc,master,tserver,monitor,tracer}
 
-GC_HOSTS=${GC_HOSTS:-${MY_HOSTNAME}}
-MASTER_HOSTS=${MASTER_HOSTS:-${MY_HOSTNAME}}
-SLAVE_HOSTS=${SLAVE_HOSTS:-${MY_HOSTNAME}}
-MONITOR_HOSTS=${MONITOR_HOSTS:-${MY_HOSTNAME}}
-TRACER_HOSTS=${TRACER_HOSTS:-${MY_HOSTNAME}}
-
-. /usr/local/accumulo/conf/accumulo-env.sh
-
-rewrite ${ACCUMULO_HOME}/conf/accumulo-site.xml
-
-(
-    for v in $(echo ${GC_HOSTS} | 
-		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
-    do
-	echo $v
-    done
-) > /usr/local/accumulo/conf/gc
-
-(
-    for v in $(echo ${MASTER_HOSTS} | 
-		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
-    do
-	echo $v
-    done
-) > /usr/local/accumulo/conf/masters
-
-(
-    for v in $(echo ${SLAVE_HOSTS} | 
-		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
-    do
-	echo $v
-    done
-) > /usr/local/accumulo/conf/slaves
-
-(
-    for v in $(echo ${MONITOR_HOSTS} | 
-		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
-    do
-	echo $v
-    done
-) > /usr/local/accumulo/conf/monitor
-
-(
-    for v in $(echo ${TRACER_HOSTS} | 
-		      sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
-    do
-	echo $v
-    done
-) > /usr/local/accumulo/conf/tracers
+rewrite ${ACCUMULO_HOME}/conf/accumulo-env.sh
+rewrite ${ACCUMULO_HOME}/conf/accumulo.properties
+rewrite ${ACCUMULO_HOME}/conf/accumulo-client.properties
 
 (
   echo "<configuration>"
@@ -124,7 +79,7 @@ do
 
   echo 'Initialise accumulo...'
   /usr/local/accumulo/bin/accumulo init --instance-name ${INSTANCE_NAME} \
-    --password ${SECRET} --clear-instance-name
+    --password ${SECRET} --clear-instance-name --upload-accumulo-props --force
   if [ $? -ne 0 ]
   then
     echo Initialisation failed.
@@ -136,16 +91,15 @@ do
 
 done
 
-/usr/local/accumulo/bin/start-here.sh
+for v in $(echo ${DAEMONS} | 
+  	       sed -e 's/,/ /g' -e "s/MY_IP/${MY_IP}/g")
+do
+    echo "Starting $v..."
+    /usr/local/accumulo/bin/accumulo-service $v start
+done
 
 while true
 do
     sleep 100000
 done
 
-#<configuration>
-#  <property>
-#    <name>fs.defaultFS</name>
-#    <value>hdfs://hadoop:9000/</value>
-#  </property>
-#</configuration>
