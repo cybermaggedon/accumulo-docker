@@ -20,15 +20,15 @@ all: ${DOWNLOADS}
 
 # FIXME: May not be the right mirror for you.
 zookeeper-${ZOOKEEPER_VERSION}.tar.gz:
-	wget -q -O $@ http://www.mirrorservice.org/sites/ftp.apache.org/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz
+	wget -O $@ http://apache.mirror.anlx.net/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz
 
 # FIXME: May not be the right mirror for you.
 accumulo-${ACCUMULO_VERSION}-bin.tar.gz:
-	wget -q -O $@ mirrors.ukfast.co.uk/sites/ftp.apache.org/accumulo/${ACCUMULO_VERSION}/accumulo-${ACCUMULO_VERSION}-bin.tar.gz
+	wget -O $@ https://apache.mirrors.nublue.co.uk/accumulo/${ACCUMULO_VERSION}/accumulo-${ACCUMULO_VERSION}-bin.tar.gz
 
 # FIXME: May not be the right mirror for you.
 hadoop-${HADOOP_VERSION}.tar.gz:
-	wget -q -O $@ http://mirror.catn.com/pub/apache/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz
+	wget -O $@ http://www.mirrorservice.org/sites/ftp.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz
 
 push:
 	${SUDO} ${DOCKER} push ${REPOSITORY}:${VERSION}
