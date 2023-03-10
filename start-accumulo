@@ -41,7 +41,7 @@ INSTANCE_NAME=${INSTANCE_NAME:-accumulo}
 SECRET=${SECRET:-accumulo}
 ACCUMULO_INIT=${ACCUMULO_INIT:-${HDFS_VOLUMES}_init}
 
-DAEMONS=${DAEMONS:-gc,master,tserver,monitor,tracer}
+DAEMONS=${DAEMONS:-manager,gc,monitor,tserver}
 
 rewrite ${ACCUMULO_HOME}/conf/accumulo-env.sh
 rewrite ${ACCUMULO_HOME}/conf/accumulo.properties

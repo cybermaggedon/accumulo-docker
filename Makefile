@@ -1,9 +1,10 @@
 
 REPOSITORY=cybermaggedon/accumulo
 VERSION=$(shell git describe | sed 's/^v//')
-ZOOKEEPER_VERSION=3.4.14
-HADOOP_VERSION=3.2.0
-ACCUMULO_VERSION=2.0.0-alpha-2
+ZOOKEEPER_VERSION=3.8.1
+HADOOP_VERSION=3.3.4
+ACCUMULO_VERSION=2.1.0
+DOCKER=docker
 
 SUDO=
 BUILD_ARGS=--build-arg ZOOKEEPER_VERSION=${ZOOKEEPER_VERSION} \
@@ -33,7 +34,7 @@ zookeeper-${ZOOKEEPER_VERSION}.tar.gz:
 
 # FIXME: May not be the right mirror for you.
 accumulo-${ACCUMULO_VERSION}-bin.tar.gz:
-	wget -O $@ https://apache.mirrors.nublue.co.uk/accumulo/${ACCUMULO_VERSION}/accumulo-${ACCUMULO_VERSION}-bin.tar.gz
+	wget -O $@ https://dlcdn.apache.org/accumulo/${ACCUMULO_VERSION}/accumulo-${ACCUMULO_VERSION}-bin.tar.gz
 
 # FIXME: May not be the right mirror for you.
 hadoop-${HADOOP_VERSION}.tar.gz:
