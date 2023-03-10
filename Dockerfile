@@ -23,6 +23,7 @@ RUN ln -s /usr/local/apache-zookeeper-${ZOOKEEPER_VERSION}-bin /usr/local/zookee
 # Accumulo
 ADD accumulo-${ACCUMULO_VERSION}-bin.tar.gz /usr/local/
 RUN ln -s /usr/local/accumulo-${ACCUMULO_VERSION} /usr/local/accumulo
+ADD libaccumulo.so /usr/local/accumulo/lib/native/
 
 # Diagnostic tools :/
 RUN dnf install -y net-tools
@@ -30,6 +31,7 @@ RUN dnf install -y telnet
 
 ENV ACCUMULO_HOME /usr/local/accumulo
 ENV PATH $PATH:$ACCUMULO_HOME/bin
+ENV JAVA_HOME /usr/lib/jvm/jre
 ADD accumulo/* $ACCUMULO_HOME/conf/
 
 ADD start-accumulo /start-accumulo
